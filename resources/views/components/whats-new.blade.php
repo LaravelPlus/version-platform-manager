@@ -58,7 +58,7 @@
                                 <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded">
                                     <p class="text-green-800 mb-2">We're excited for you to experience these updates.</p>
                                     <p class="text-green-800">If you have any questions or comments, please don't hesitate to reach out.</p>
-                                    <p class="text-green-900 font-semibold mt-3">Best regards,<br>Kitio Internacional d.o.o.</p>
+                                    
                                 </div>
                             </div>
                         </div>
