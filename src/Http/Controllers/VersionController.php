@@ -47,7 +47,7 @@ class VersionController extends Controller
 
         $this->versionService->createPlatformVersion($validated);
 
-        return redirect()->route('admin.versions.index')
+        return redirect()->route('version-manager.versions.index')
             ->with('success', 'Platform version created successfully.');
     }
 
@@ -74,7 +74,7 @@ class VersionController extends Controller
 
         $version->update($validated);
 
-        return redirect()->route('admin.versions.index')
+        return redirect()->route('version-manager.versions.index')
             ->with('success', 'Platform version updated successfully.');
     }
 
@@ -85,7 +85,7 @@ class VersionController extends Controller
     {
         $version->delete();
 
-        return redirect()->route('admin.versions.index')
+        return redirect()->route('version-manager.versions.index')
             ->with('success', 'Platform version deleted successfully.');
     }
 

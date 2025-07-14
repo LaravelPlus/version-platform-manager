@@ -46,7 +46,8 @@ return [
     */
     'admin' => [
         'enabled' => env('VERSION_ADMIN_ENABLED', true),
-        'route_prefix' => env('VERSION_ADMIN_ROUTE_PREFIX', 'admin/versions'),
+        'route_prefix' => env('VERSION_ADMIN_ROUTE_PREFIX', 'admin/version-manager'),
+        'route_name_prefix' => env('VERSION_ADMIN_ROUTE_NAME_PREFIX', 'version-manager'),
         'middleware' => ['web', 'auth'],
     ],
 
