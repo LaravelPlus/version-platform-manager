@@ -107,87 +107,48 @@
                 <div class="px-4 py-5 sm:p-6">
                     <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Quick Actions</h3>
                     <div class="space-y-3">
-                        <a href="{{ route('version-manager.versions.create') }}" class="relative group bg-white p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md">
-                            <div>
-                                <span class="rounded-lg inline-flex p-3 bg-blue-50 text-blue-700 ring-4 ring-white">
-                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="mt-4">
-                                <h3 class="text-lg font-medium text-gray-900">
-                                    Create New Version
-                                </h3>
-                                <p class="mt-2 text-sm text-gray-500">Add a new platform version with release notes</p>
-                            </div>
-                            <span class="pointer-events-none absolute top-4 right-4 text-gray-300 group-hover:text-gray-400" aria-hidden="true">
-                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M20 4h1a1 1 0 00-1-1v1zm-1 12a1 1 0 102 0h-2zM8 3a1 1 0 000 2V3zM3.293 19.293a1 1 0 101.414 1.414l-1.414-1.414zM19 4v12h2V4h-2zm1-1H8v2h12V3zm-.707.293l-16 16 1.414 1.414 16-16-1.414-1.414z" />
+                        <a href="{{ route('version-manager.versions.create') }}" class="group bg-white p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md flex items-start space-x-4">
+                            <span class="rounded-lg inline-flex p-3 bg-blue-50 text-blue-700 ring-4 ring-white flex-shrink-0">
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                 </svg>
                             </span>
-                        </a>
-
-                        <a href="{{ route('version-manager.versions.index') }}" class="relative group bg-white p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md">
-                            <div>
-                                <span class="rounded-lg inline-flex p-3 bg-green-50 text-green-700 ring-4 ring-white">
-                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="mt-4">
-                                <h3 class="text-lg font-medium text-gray-900">
-                                    Manage Versions
-                                </h3>
-                                <p class="mt-2 text-sm text-gray-500">View and edit all platform versions</p>
-                            </div>
-                            <span class="pointer-events-none absolute top-4 right-4 text-gray-300 group-hover:text-gray-400" aria-hidden="true">
-                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M20 4h1a1 1 0 00-1-1v1zm-1 12a1 1 0 102 0h-2zM8 3a1 1 0 000 2V3zM3.293 19.293a1 1 0 101.414 1.414l-1.414-1.414zM19 4v12h2V4h-2zm1-1H8v2h12V3zm-.707.293l-16 16 1.414 1.414 16-16-1.414-1.414z" />
-                                </svg>
+                            <span>
+                                <span class="block text-lg font-medium text-gray-900">Create New Version</span>
+                                <span class="block mt-1 text-sm text-gray-500">Add a new platform version with release notes</span>
                             </span>
                         </a>
-
-                        <a href="{{ route('version-manager.users.index') }}" class="relative group bg-white p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md">
-                            <div>
-                                <span class="rounded-lg inline-flex p-3 bg-purple-50 text-purple-700 ring-4 ring-white">
-                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="mt-4">
-                                <h3 class="text-lg font-medium text-gray-900">
-                                    User Management
-                                </h3>
-                                <p class="mt-2 text-sm text-gray-500">Manage users and their permissions</p>
-                            </div>
-                            <span class="pointer-events-none absolute top-4 right-4 text-gray-300 group-hover:text-gray-400" aria-hidden="true">
-                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M20 4h1a1 1 0 00-1-1v1zm-1 12a1 1 0 102 0h-2zM8 3a1 1 0 000 2V3zM3.293 19.293a1 1 0 101.414 1.414l-1.414-1.414zM19 4v12h2V4h-2zm1-1H8v2h12V3zm-.707.293l-16 16 1.414 1.414 16-16-1.414-1.414z" />
+                        <a href="{{ route('version-manager.versions.index') }}" class="group bg-white p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md flex items-start space-x-4">
+                            <span class="rounded-lg inline-flex p-3 bg-green-50 text-green-700 ring-4 ring-white flex-shrink-0">
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                 </svg>
                             </span>
+                            <span>
+                                <span class="block text-lg font-medium text-gray-900">Manage Versions</span>
+                                <span class="block mt-1 text-sm text-gray-500">View and edit all platform versions</span>
+                            </span>
                         </a>
-
-                        <a href="{{ route('version-manager.analytics.index') }}" class="relative group bg-white p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md">
-                            <div>
-                                <span class="rounded-lg inline-flex p-3 bg-orange-50 text-orange-700 ring-4 ring-white">
-                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="mt-4">
-                                <h3 class="text-lg font-medium text-gray-900">
-                                    Analytics
-                                </h3>
-                                <p class="mt-2 text-sm text-gray-500">View detailed analytics and reports</p>
-                            </div>
-                            <span class="pointer-events-none absolute top-4 right-4 text-gray-300 group-hover:text-gray-400" aria-hidden="true">
-                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M20 4h1a1 1 0 00-1-1v1zm-1 12a1 1 0 102 0h-2zM8 3a1 1 0 000 2V3zM3.293 19.293a1 1 0 101.414 1.414l-1.414-1.414zM19 4v12h2V4h-2zm1-1H8v2h12V3zm-.707.293l-16 16 1.414 1.414 16-16-1.414-1.414z" />
+                        <a href="{{ route('version-manager.users.index') }}" class="group bg-white p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md flex items-start space-x-4">
+                            <span class="rounded-lg inline-flex p-3 bg-purple-50 text-purple-700 ring-4 ring-white flex-shrink-0">
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                                 </svg>
+                            </span>
+                            <span>
+                                <span class="block text-lg font-medium text-gray-900">User Management</span>
+                                <span class="block mt-1 text-sm text-gray-500">Manage users and their permissions</span>
+                            </span>
+                        </a>
+                        <a href="{{ route('version-manager.analytics.index') }}" class="group bg-white p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md flex items-start space-x-4">
+                            <span class="rounded-lg inline-flex p-3 bg-orange-50 text-orange-700 ring-4 ring-white flex-shrink-0">
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                            </span>
+                            <span>
+                                <span class="block text-lg font-medium text-gray-900">Analytics</span>
+                                <span class="block mt-1 text-sm text-gray-500">View detailed analytics and reports</span>
                             </span>
                         </a>
                     </div>
