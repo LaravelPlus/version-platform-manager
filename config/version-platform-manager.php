@@ -93,4 +93,15 @@ return [
         'enabled' => env('VERSION_NOTIFICATIONS_ENABLED', true),
         'channels' => ['mail', 'database'],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Whats New Style
+    |--------------------------------------------------------------------------
+    |
+    | The style for the whats new modal. Options: 'tailwind', 'bootstrap'
+    |
+    */
+    'whats_new_style' => env('VERSION_WHATS_NEW_STYLE', 'tailwind'), // or 'bootstrap'
+    'whats_new_signature' => env('VERSION_WHATS_NEW_SIGNATURE', 'Best regards, <br>Your Company Name'),
 ]; 
