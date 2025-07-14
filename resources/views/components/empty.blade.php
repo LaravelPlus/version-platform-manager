@@ -1,0 +1,1 @@
+{{-- Empty component when no updates are needed --}} 
