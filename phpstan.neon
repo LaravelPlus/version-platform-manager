@@ -1,0 +1,43 @@
+includes:
+    - vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+    level: 4
+
+    paths:
+        - app
+        - bootstrap
+        - config
+        - routes
+        - database
+        - tests
+
+    excludePaths:
+        - storage/*
+        - vendor/*
+        - node_modules/*
+        - public/*
+        - resources/js/*
+        - resources/vue/*
+        - resources/sass/*
+        - bootstrap/cache/*
+        - database/migrations/*.php
+        - app/helpers.php
+
+    inferPrivatePropertyTypeFromConstructor: true
+    treatPhpDocTypesAsCertain: true
+    reportUnmatchedIgnoredErrors: false
+    checkMissingTypehints: true
+    checkUninitializedProperties: true
+    checkExplicitMixed: true
+
+    bootstrapFiles:
+        - bootstrap/app.php
+
+    scanFiles:
+        - app/Providers/AppServiceProvider.php
+
+    ignoreErrors:
+        - '#Call to an undefined method Illuminate\\[a-zA-Z\\]+#'
+        - '#^Access to an undefined property App\\Models\\.*::$#'
+        - '#Property App\\Models\\.* has unknown class#'

@@ -111,7 +111,7 @@
         <div class="bg-white shadow sm:rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Version Adoption</h3>
-                <div class="space-y-4">
+                <div v-if="versionAdoption.length > 0" class="space-y-4">
                     <div v-for="version in versionAdoption" :key="version.version" class="flex items-center justify-between">
                         <div class="flex items-center">
                             <span class="text-sm font-medium text-gray-900">@{{ version.version }}</span>
@@ -125,6 +125,9 @@
                         </div>
                     </div>
                 </div>
+                <div v-else class="text-center py-8 text-gray-500">
+                    <p>No version adoption data available</p>
+                </div>
             </div>
         </div>
 
@@ -132,7 +135,7 @@
         <div class="bg-white shadow sm:rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">User Activity</h3>
-                <div class="space-y-4">
+                <div v-if="userActivity.length > 0" class="space-y-4">
                     <div v-for="activity in userActivity" :key="activity.period" class="flex items-center justify-between">
                         <span class="text-sm font-medium text-gray-900">@{{ activity.period }}</span>
                         <div class="flex items-center">
@@ -142,6 +145,9 @@
                             <span class="text-sm font-medium text-gray-900">@{{ activity.users }}</span>
                         </div>
                     </div>
+                </div>
+                <div v-else class="text-center py-8 text-gray-500">
+                    <p>No user activity data available</p>
                 </div>
             </div>
         </div>
@@ -153,7 +159,7 @@
         <div class="bg-white shadow sm:rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Update Notifications</h3>
-                <div class="space-y-3">
+                <div v-if="updateNotifications.length > 0" class="space-y-3">
                     <div v-for="notification in updateNotifications" :key="notification.id" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div>
                             <p class="text-sm font-medium text-gray-900">@{{ notification.version }}</p>
@@ -165,6 +171,9 @@
                         </div>
                     </div>
                 </div>
+                <div v-else class="text-center py-8 text-gray-500">
+                    <p>No update notifications available</p>
+                </div>
             </div>
         </div>
 
@@ -172,7 +181,7 @@
         <div class="bg-white shadow sm:rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Top Users</h3>
-                <div class="space-y-3">
+                <div v-if="topUsers.length > 0" class="space-y-3">
                     <div v-for="user in topUsers" :key="user.id" class="flex items-center justify-between">
                         <div class="flex items-center">
                             <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center mr-3">
@@ -186,6 +195,9 @@
                         <span class="text-sm font-medium text-gray-900">@{{ user.loginCount }}</span>
                     </div>
                 </div>
+                <div v-else class="text-center py-8 text-gray-500">
+                    <p>No user data available</p>
+                </div>
             </div>
         </div>
 
@@ -193,7 +205,7 @@
         <div class="bg-white shadow sm:rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Recent Activity</h3>
-                <div class="space-y-3">
+                <div v-if="recentActivity.length > 0" class="space-y-3">
                     <div v-for="activity in recentActivity" :key="activity.id" class="flex items-start space-x-3">
                         <div class="flex-shrink-0">
                             <div class="h-6 w-6 rounded-full flex items-center justify-center" :class="getActivityColor(activity.type)">
@@ -208,6 +220,9 @@
                         </div>
                     </div>
                 </div>
+                <div v-else class="text-center py-8 text-gray-500">
+                    <p>No recent activity available</p>
+                </div>
             </div>
         </div>
     </div>
@@ -220,42 +235,12 @@ createApp({
     data() {
         return {
             selectedPeriod: '30',
-            metrics: {
-                totalUsers: 1250,
-                activeUsers: 892,
-                adoptionRate: 71.4,
-                avgUpdateTime: 3.2
-            },
-            versionAdoption: [
-                { version: '2.1.0', users: 456, percentage: 36.5 },
-                { version: '2.0.0', users: 389, percentage: 31.1 },
-                { version: '1.9.0', users: 234, percentage: 18.7 },
-                { version: '1.8.0', users: 171, percentage: 13.7 }
-            ],
-            userActivity: [
-                { period: 'Today', users: 156, percentage: 12.5 },
-                { period: 'This Week', users: 892, percentage: 71.4 },
-                { period: 'This Month', users: 1245, percentage: 99.6 }
-            ],
-            updateNotifications: [
-                { id: 1, version: '2.1.0', date: '2024-01-15', sent: 234 },
-                { id: 2, version: '2.0.0', date: '2024-01-10', sent: 456 },
-                { id: 3, version: '1.9.0', date: '2024-01-05', sent: 189 }
-            ],
-            topUsers: [
-                { id: 1, name: 'John Doe', version: '2.1.0', loginCount: 45 },
-                { id: 2, name: 'Jane Smith', version: '2.1.0', loginCount: 38 },
-                { id: 3, name: 'Bob Johnson', version: '2.0.0', loginCount: 32 },
-                { id: 4, name: 'Alice Brown', version: '2.1.0', loginCount: 29 },
-                { id: 5, name: 'Charlie Wilson', version: '2.0.0', loginCount: 26 }
-            ],
-            recentActivity: [
-                { id: 1, type: 'update', title: 'Version 2.1.0 released', time: '2 hours ago' },
-                { id: 2, type: 'user', title: 'New user registered', time: '4 hours ago' },
-                { id: 3, type: 'notification', title: 'Update notification sent', time: '6 hours ago' },
-                { id: 4, type: 'update', title: 'Version 2.0.0 activated', time: '1 day ago' },
-                { id: 5, type: 'user', title: 'User updated to 2.1.0', time: '1 day ago' }
-            ]
+            metrics: @json($analyticsData['metrics'] ?? []),
+            versionAdoption: @json($analyticsData['versionAdoption'] ?? []),
+            userActivity: @json($analyticsData['userActivity'] ?? []),
+            updateNotifications: @json($analyticsData['updateNotifications'] ?? []),
+            topUsers: @json($analyticsData['topUsers'] ?? []),
+            recentActivity: @json($analyticsData['recentActivity'] ?? [])
         }
     },
     methods: {
@@ -268,7 +253,13 @@ createApp({
             return colors[type] || 'bg-gray-500';
         },
         exportAnalytics() {
-            alert('Exporting analytics data...');
+            // Create a temporary link to download the analytics data
+            const link = document.createElement('a');
+            link.href = '{{ route("version-manager.analytics.export") }}';
+            link.download = 'analytics_' + new Date().toISOString().slice(0, 10) + '.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     },
     watch: {

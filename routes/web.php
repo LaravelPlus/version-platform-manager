@@ -14,7 +14,7 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     // Version Manager Admin routes
     Route::prefix(config('version-platform-manager.admin.route_prefix', 'admin/version-manager'))
-        ->middleware(config('version-platform-manager.admin.middleware', ['web', 'auth']))
+        ->middleware(['web', 'auth'])
         ->group(function () {
             // Dashboard
             Route::get('/', [DashboardController::class, 'index'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.dashboard');
@@ -55,4 +55,9 @@ Route::middleware(['web', 'auth'])->group(function () {
                 Route::delete('/{whatsNew}', [WhatsNewController::class, 'destroy'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.whats-new.destroy');
             });
         });
-}); 
+});
+
+// Standalone public What's New page
+Route::get(config('version-platform-manager.public_whats_new.url', 'whats-new'), function () {
+    return view(config('version-platform-manager.public_whats_new.view', 'version-platform-manager::whats-new.page'));
+})->name('version-platform-manager.whats-new.public'); 

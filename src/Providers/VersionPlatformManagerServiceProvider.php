@@ -21,6 +21,20 @@ class VersionPlatformManagerServiceProvider extends ServiceProvider
         $this->app->singleton(VersionService::class, function ($app) {
             return new VersionService();
         });
+
+        $this->app->bind(\LaravelPlus\VersionPlatformManager\Contracts\PlatformVersionRepositoryInterface::class, \LaravelPlus\VersionPlatformManager\Repositories\PlatformVersionRepository::class);
+        $this->app->bind(\LaravelPlus\VersionPlatformManager\Contracts\WhatsNewRepositoryInterface::class, \LaravelPlus\VersionPlatformManager\Repositories\WhatsNewRepository::class);
+        $this->app->bind(\LaravelPlus\VersionPlatformManager\Contracts\UserVersionRepositoryInterface::class, \LaravelPlus\VersionPlatformManager\Repositories\UserVersionRepository::class);
+        $this->app->bind(\LaravelPlus\VersionPlatformManager\Contracts\UserRepositoryInterface::class, \LaravelPlus\VersionPlatformManager\Repositories\UserRepository::class);
+        
+        // Register AnalyticsService
+        $this->app->singleton(\LaravelPlus\VersionPlatformManager\Services\AnalyticsService::class, function ($app) {
+            return new \LaravelPlus\VersionPlatformManager\Services\AnalyticsService(
+                $app->make(\LaravelPlus\VersionPlatformManager\Contracts\UserRepositoryInterface::class),
+                $app->make(\LaravelPlus\VersionPlatformManager\Contracts\UserVersionRepositoryInterface::class),
+                $app->make(\LaravelPlus\VersionPlatformManager\Contracts\PlatformVersionRepositoryInterface::class)
+            );
+        });
     }
 
     /**

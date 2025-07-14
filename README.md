@@ -92,6 +92,40 @@ The package configuration file `config/version-platform-manager.php` contains:
 - Version comparison logic
 - Admin panel settings
 
+## Admin Sidebar (Dynamic Navbar)
+
+The admin sidebar is fully configurable via the `navbar_links` array in `config/version-platform-manager.php`.
+
+You can add, remove, or reorder links. Each link supports:
+- `label`: The text to display
+- `route`: (optional) The Laravel route name to use
+- `url`: (optional) A direct URL (internal or external)
+- `icon`: (optional) SVG icon markup
+- `target`: (optional) e.g. `_blank` to open in a new tab
+
+**Example:**
+
+```php
+'navbar_links' => [
+    [
+        'label' => 'Dashboard',
+        'route' => 'version-manager.dashboard',
+        'icon' => '<svg ...></svg>',
+    ],
+    [
+        'label' => 'Logs',
+        'url' => '/admin/logs',
+        'icon' => '<svg ...></svg>',
+        'target' => '_blank', // open in new tab
+    ],
+    // Add more links as needed
+],
+```
+
+- If both `route` and `url` are present, `route` is used.
+- The sidebar will highlight the active link for both route and URL types.
+- You can use any SVG icon markup for the `icon` field.
+
 ## Database Structure
 
 ### Platform Versions Table

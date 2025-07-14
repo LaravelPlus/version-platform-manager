@@ -1,9 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace LaravelPlus\VersionPlatformManager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
 use LaravelPlus\VersionPlatformManager\Services\VersionService;
 
@@ -16,7 +18,7 @@ class VersionController extends Controller
     /**
      * Display a listing of platform versions.
      */
-    public function index()
+    public function index(): View
     {
         $versions = PlatformVersion::orderBy('version', 'desc')->paginate(20);
         $statistics = $this->versionService->getVersionStatistics();
@@ -27,7 +29,7 @@ class VersionController extends Controller
     /**
      * Show the form for creating a new platform version.
      */
-    public function create()
+    public function create(): View
     {
         return view('version-platform-manager::admin.versions.create');
     }
@@ -54,7 +56,7 @@ class VersionController extends Controller
     /**
      * Show the form for editing the specified platform version.
      */
-    public function edit(PlatformVersion $version)
+    public function edit(PlatformVersion $version): View
     {
         return view('version-platform-manager::admin.versions.edit', compact('version'));
     }

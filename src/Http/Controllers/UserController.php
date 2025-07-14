@@ -1,20 +1,27 @@
 <?php
+declare(strict_types=1);
 
 namespace LaravelPlus\VersionPlatformManager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use LaravelPlus\VersionPlatformManager\Contracts\UserRepositoryInterface;
+use App\Models\User;
 
 class UserController extends Controller
 {
+    public function __construct(
+        private UserRepositoryInterface $userRepository
+    ) {}
+
     /**
      * Display a listing of users.
      */
     public function index(): View
     {
-        // In a real application, you would fetch users from the database
-        // For now, we'll return the view with mock data
-        return view('version-platform-manager::admin.users.index');
+        $users = $this->userRepository->paginate(20);
+        return view('version-platform-manager::admin.users.index', compact('users'));
     }
 
     /**
@@ -28,18 +35,16 @@ class UserController extends Controller
     /**
      * Store a newly created user in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        // Validate the request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
             'role' => 'required|string|in:admin,user',
-            'current_version' => 'required|string',
         ]);
-
-        // In a real application, you would create the user
-        // For now, we'll redirect back with a success message
+        $validated['password'] = bcrypt($validated['password']);
+        $this->userRepository->create($validated);
         return redirect()->route('version-manager.users.index')
             ->with('success', 'User created successfully.');
     }
@@ -49,25 +54,28 @@ class UserController extends Controller
      */
     public function edit($user): View
     {
-        // In a real application, you would fetch the user from the database
+        $user = $this->userRepository->find((int)$user);
         return view('version-platform-manager::admin.users.edit', compact('user'));
     }
 
     /**
      * Update the specified user in storage.
      */
-    public function update(Request $request, $user)
+    public function update(Request $request, $user): RedirectResponse
     {
-        // Validate the request
+        $user = $this->userRepository->find((int)$user);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user,
+            'email' => 'required|email|unique:users,email,' . $user->id,
             'role' => 'required|string|in:admin,user',
-            'current_version' => 'required|string',
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
-
-        // In a real application, you would update the user
-        // For now, we'll redirect back with a success message
+        if (!empty($validated['password'])) {
+            $validated['password'] = bcrypt($validated['password']);
+        } else {
+            unset($validated['password']);
+        }
+        $this->userRepository->update($user, $validated);
         return redirect()->route('version-manager.users.index')
             ->with('success', 'User updated successfully.');
     }
@@ -75,10 +83,10 @@ class UserController extends Controller
     /**
      * Remove the specified user from storage.
      */
-    public function destroy($user)
+    public function destroy($user): RedirectResponse
     {
-        // In a real application, you would delete the user
-        // For now, we'll redirect back with a success message
+        $user = $this->userRepository->find((int)$user);
+        $this->userRepository->delete($user);
         return redirect()->route('version-manager.users.index')
             ->with('success', 'User deleted successfully.');
     }

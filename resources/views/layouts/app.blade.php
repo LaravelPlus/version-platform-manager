@@ -39,8 +39,8 @@
         }
     </script>
 </head>
-<body class="font-sans antialiased bg-gray-50">
-    <div class="min-h-screen">
+<body class="font-sans antialiased bg-gray-50 min-h-screen flex flex-col">
+    <div class="flex-1 flex flex-col">
         <!-- Navigation -->
         <nav class="bg-white shadow-sm border-b border-gray-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -52,7 +52,6 @@
                             </a>
                         </div>
                     </div>
-                    
                     <div class="flex items-center space-x-4">
                         @auth
                             <span class="text-gray-700">{{ Auth::user()->name }}</span>
@@ -67,22 +66,19 @@
                 </div>
             </div>
         </nav>
-
         <!-- Page Content -->
-        <main class="py-8">
+        <main class="py-8 flex-1">
             @yield('content')
         </main>
-
-        <!-- Footer -->
-        <footer class="bg-white border-t border-gray-200 mt-auto">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <div class="text-center text-gray-500 text-sm">
-                    &copy; {{ date('Y') }} Platform Manager. All rights reserved.
-                </div>
-            </div>
-        </footer>
     </div>
-
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="text-center text-gray-500 text-sm">
+                &copy; {{ date('Y') }} Platform Manager. All rights reserved.
+            </div>
+        </div>
+    </footer>
     @stack('scripts')
 </body>
 </html> 

@@ -1,34 +1,32 @@
 <?php
+declare(strict_types=1);
 
 namespace LaravelPlus\VersionPlatformManager\Http\Controllers;
 
-use Illuminate\Http\Request;
-use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
-use LaravelPlus\VersionPlatformManager\Services\VersionService;
+use Illuminate\View\View;
+use LaravelPlus\VersionPlatformManager\Contracts\PlatformVersionRepositoryInterface;
+use LaravelPlus\VersionPlatformManager\Contracts\UserVersionRepositoryInterface;
 
 class DashboardController extends Controller
 {
     public function __construct(
-        private VersionService $versionService
+        private PlatformVersionRepositoryInterface $platformVersionRepository,
+        private UserVersionRepositoryInterface $userVersionRepository
     ) {}
 
     /**
      * Display the dashboard with statistics and recent activity.
      */
-    public function index()
+    public function index(): View
     {
-        // Get statistics
         $statistics = [
-            'total_versions' => PlatformVersion::count(),
-            'active_versions' => PlatformVersion::where('is_active', true)->count(),
-            'total_users' => 0, // This would be from your user model
-            'versions_this_month' => PlatformVersion::whereMonth('created_at', now()->month)->count(),
+            'total_versions' => $this->platformVersionRepository->all()->count(),
+            'active_versions' => $this->platformVersionRepository->active()->count(),
+            'total_users' => $this->userVersionRepository->all()->count(),
+            'versions_this_month' => $this->platformVersionRepository->all()->where('created_at', '>=', now()->startOfMonth())->count(),
         ];
 
-        // Get recent versions
-        $recentVersions = PlatformVersion::orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
+        $recentVersions = $this->platformVersionRepository->all()->sortByDesc('created_at')->take(5);
 
         return view('version-platform-manager::admin.dashboard', compact('statistics', 'recentVersions'));
     }

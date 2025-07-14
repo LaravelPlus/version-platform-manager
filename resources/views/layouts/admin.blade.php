@@ -54,34 +54,17 @@
             <!-- Navigation -->
             <nav class="flex-1 mt-8 px-4">
                 <div class="space-y-2">
-                    <a href="{{ route('version-manager.dashboard') }}" class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-gray-900 {{ request()->routeIs('version-manager.dashboard') ? 'bg-blue-50 text-blue-700' : '' }}">
-                        <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z" />
-                        </svg>
-                        Dashboard
-                    </a>
-                    
-                    <a href="{{ route('version-manager.versions.index') }}" class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-gray-900 {{ request()->routeIs('version-manager.versions.*') ? 'bg-blue-50 text-blue-700' : '' }}">
-                        <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-                        </svg>
-                        Versions
-                    </a>
-                    
-                    <a href="{{ route('version-manager.users.index') }}" class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-gray-900 {{ request()->routeIs('version-manager.users.*') ? 'bg-blue-50 text-blue-700' : '' }}">
-                        <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                        </svg>
-                        Users
-                    </a>
-                    
-                    <a href="{{ route('version-manager.analytics.index') }}" class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-gray-900 {{ request()->routeIs('version-manager.analytics.*') ? 'bg-blue-50 text-blue-700' : '' }}">
-                        <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                        Analytics
-                    </a>
+                    @foreach (config('version-platform-manager.navbar_links', []) as $link)
+                        @php
+                            $isActive = isset($link['route']) ? request()->routeIs($link['route'] . '*') : (request()->is(ltrim($link['url'] ?? '', '/')) ? 'bg-blue-50 text-blue-700' : '');
+                        @endphp
+                        <a href="{{ isset($link['route']) ? route($link['route']) : url($link['url']) }}"
+                           class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-gray-900 {{ $isActive }}"
+                           @if(isset($link['target'])) target="{{ $link['target'] }}" @endif>
+                            {!! $link['icon'] ?? '' !!}
+                            {{ $link['label'] }}
+                        </a>
+                    @endforeach
                 </div>
             </nav>
 
