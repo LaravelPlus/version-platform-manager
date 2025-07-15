@@ -26,11 +26,19 @@ class ShowWhatsNewModal
 
         if ($shouldCheck && Auth::check()) {
             $versionService = app(VersionService::class);
-            if ($versionService->userNeedsUpdate(Auth::user())) {
+            $userNeedsUpdate = $versionService->userNeedsUpdate(Auth::user());
+            $whatsNewUrl = '/' . ltrim(config('version-platform-manager.public_whats_new.url', 'whats-new'), '/');
+            $onWhatsNewPage = $request->path() === ltrim($whatsNewUrl, '/');
+
+            if ($userNeedsUpdate) {
                 // Avoid redirect loop
-                $whatsNewUrl = '/' . ltrim(config('version-platform-manager.public_whats_new.url', 'whats-new'), '/');
-                if ($request->path() !== ltrim($whatsNewUrl, '/')) {
+                if (!$onWhatsNewPage) {
                     return redirect($whatsNewUrl);
+                }
+            } else {
+                // If already read and on whats-new page, redirect to home
+                if ($onWhatsNewPage) {
+                    return redirect()->route('home');
                 }
             }
         }

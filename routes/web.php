@@ -6,6 +6,7 @@ use LaravelPlus\VersionPlatformManager\Http\Controllers\WhatsNewController;
 use LaravelPlus\VersionPlatformManager\Http\Controllers\UserController;
 use LaravelPlus\VersionPlatformManager\Http\Controllers\AnalyticsController;
 use LaravelPlus\VersionPlatformManager\Http\Controllers\DashboardController;
+use LaravelPlus\VersionPlatformManager\Http\Controllers\PublicWhatsNewController;
 
 Route::middleware(['web', 'auth'])->group(function () {
     // Mark version as seen
@@ -60,7 +61,12 @@ Route::middleware(['web', 'auth'])->group(function () {
         });
 });
 
-// Standalone public What's New page
-Route::get(config('version-platform-manager.public_whats_new.url', 'whats-new'), function () {
-    return view(config('version-platform-manager.public_whats_new.view', 'version-platform-manager::whats-new.page'));
-})->name('version-platform-manager.whats-new.public'); 
+// Standalone public What's New page (requires authentication)
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get(config('version-platform-manager.public_whats_new.url', 'whats-new'), [PublicWhatsNewController::class, 'index'])
+        ->name('version-platform-manager.whats-new.public');
+
+    // Mark as read route for public whats-new page
+    Route::post('/whats-new/mark-read', [PublicWhatsNewController::class, 'markAsRead'])
+        ->name('version-platform-manager.whats-new.mark-read');
+}); 
