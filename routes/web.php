@@ -18,6 +18,7 @@ Route::middleware(['web', 'auth'])->group(function () {
         ->group(function () {
             // Dashboard
             Route::get('/', [DashboardController::class, 'index'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.dashboard');
+            Route::get('/health', [DashboardController::class, 'healthCheck'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.health');
 
             // Versions
             Route::prefix('versions')->group(function () {
@@ -53,6 +54,8 @@ Route::middleware(['web', 'auth'])->group(function () {
                 Route::get('/{whatsNew}/edit', [WhatsNewController::class, 'edit'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.whats-new.edit');
                 Route::put('/{whatsNew}', [WhatsNewController::class, 'update'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.whats-new.update');
                 Route::delete('/{whatsNew}', [WhatsNewController::class, 'destroy'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.whats-new.destroy');
+                Route::get('/export-markdown/{platformVersion}', [WhatsNewController::class, 'exportMarkdown'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.whats-new.export-markdown');
+                Route::post('/import-markdown/{platformVersion}', [WhatsNewController::class, 'importMarkdown'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.whats-new.import-markdown');
             });
         });
 });

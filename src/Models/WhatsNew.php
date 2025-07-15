@@ -11,9 +11,13 @@ class WhatsNew extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /**
+     * The table associated with the model.
+     */
+    protected $table = 'whats_new';
+
     protected $fillable = [
         'platform_version_id',
-        'title',
         'content',
         'type',
         'is_active',
@@ -81,5 +85,72 @@ class WhatsNew extends Model
         ];
 
         return $icons[$this->type] ?? '📝';
+    }
+
+    /**
+     * Auto-detect type from content emoji.
+     */
+    public function detectTypeFromContent(): string
+    {
+        $emojiTypeMap = [
+            '🎉' => 'feature',
+            '⚡' => 'improvement',
+            '🐛' => 'bugfix',
+            '🔒' => 'security',
+            '⚠️' => 'deprecation',
+        ];
+
+        // Get first line and check for emoji
+        $lines = explode("\n", $this->content);
+        $firstLine = trim($lines[0] ?? '');
+        
+        foreach ($emojiTypeMap as $emoji => $type) {
+            if (str_starts_with($firstLine, $emoji)) {
+                return $type;
+            }
+        }
+
+        return 'feature'; // Default
+    }
+
+    /**
+     * Extract title from content (first line without emoji).
+     */
+    public function getTitleFromContent(): string
+    {
+        $lines = explode("\n", $this->content);
+        $firstLine = trim($lines[0] ?? '');
+        
+        // Remove emoji from start
+        $emojiPattern = '/^[🎉⚡🐛🔒⚠️📝]\s*/u';
+        $title = preg_replace($emojiPattern, '', $firstLine);
+        
+        return $title ?: 'Untitled';
+    }
+
+    /**
+     * Get content without title (for description).
+     */
+    public function getContentWithoutTitle(): string
+    {
+        $lines = explode("\n", $this->content);
+        
+        // Remove first line (title) and return rest
+        array_shift($lines);
+        
+        return trim(implode("\n", $lines));
+    }
+
+    /**
+     * Set content and auto-detect type.
+     */
+    public function setContentAttribute($value): void
+    {
+        $this->attributes['content'] = $value;
+        
+        // Auto-detect type if not set
+        if (empty($this->attributes['type'])) {
+            $this->attributes['type'] = $this->detectTypeFromContent();
+        }
     }
 } 

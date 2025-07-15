@@ -10,6 +10,11 @@ class UserVersion extends Model
 {
     use HasFactory;
 
+    /**
+     * The table associated with the model.
+     */
+    protected $table = 'user_versions';
+
     protected $fillable = [
         'user_id',
         'version',

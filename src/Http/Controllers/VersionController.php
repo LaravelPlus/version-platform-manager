@@ -45,9 +45,18 @@ class VersionController extends Controller
             'description' => 'nullable|string',
             'is_active' => 'boolean',
             'released_at' => 'nullable|date',
+            'whats_new_markdown' => 'nullable|string',
         ]);
 
-        $this->versionService->createPlatformVersion($validated);
+        $version = $this->versionService->createPlatformVersion($validated);
+
+        // Handle What's New markdown content
+        if ($request->has('whats_new_markdown') && $request->whats_new_markdown) {
+            // Store the markdown content in the version's metadata
+            $metadata = $version->metadata ?? [];
+            $metadata['whats_new_markdown'] = $request->whats_new_markdown;
+            $version->update(['metadata' => $metadata]);
+        }
 
         return redirect()->route('version-manager.versions.index')
             ->with('success', 'Platform version created successfully.');
@@ -72,9 +81,22 @@ class VersionController extends Controller
             'description' => 'nullable|string',
             'is_active' => 'boolean',
             'released_at' => 'nullable|date',
+            'whats_new_markdown' => 'nullable|string',
         ]);
 
         $version->update($validated);
+
+        // Handle What's New markdown content
+        if ($request->has('whats_new_markdown')) {
+            // Store the markdown content in the version's metadata
+            $metadata = $version->metadata ?? [];
+            if ($request->whats_new_markdown) {
+                $metadata['whats_new_markdown'] = $request->whats_new_markdown;
+            } else {
+                unset($metadata['whats_new_markdown']);
+            }
+            $version->update(['metadata' => $metadata]);
+        }
 
         return redirect()->route('version-manager.versions.index')
             ->with('success', 'Platform version updated successfully.');

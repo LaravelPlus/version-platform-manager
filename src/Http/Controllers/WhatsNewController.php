@@ -4,14 +4,18 @@ namespace LaravelPlus\VersionPlatformManager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use LaravelPlus\VersionPlatformManager\Models\WhatsNew;
 use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
-use LaravelPlus\VersionPlatformManager\Services\VersionService;
+use LaravelPlus\VersionPlatformManager\Repositories\WhatsNewRepository;
+use LaravelPlus\VersionPlatformManager\Http\Requests\WhatsNew\StoreWhatsNewRequest;
+use LaravelPlus\VersionPlatformManager\Http\Requests\WhatsNew\UpdateWhatsNewRequest;
+use LaravelPlus\VersionPlatformManager\Http\Requests\WhatsNew\ImportMarkdownRequest;
 
 class WhatsNewController extends Controller
 {
     public function __construct(
-        private VersionService $versionService
+        private WhatsNewRepository $whatsNewRepository
     ) {}
 
     /**
@@ -19,11 +23,10 @@ class WhatsNewController extends Controller
      */
     public function index()
     {
-        $whatsNew = WhatsNew::with('platformVersion')
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $whatsNew = $this->whatsNewRepository->all();
+        $versions = $this->whatsNewRepository->getAllPlatformVersions();
 
-        return view('version-platform-manager::admin.whats-new.index', compact('whatsNew'));
+        return view('version-platform-manager::admin.whats-new.index', compact('whatsNew', 'versions'));
     }
 
     /**
@@ -31,29 +34,26 @@ class WhatsNewController extends Controller
      */
     public function create()
     {
-        $versions = PlatformVersion::active()->orderBy('version', 'desc')->get();
-        $types = config('version-platform-manager.feature_types', []);
+        $versions = $this->whatsNewRepository->getAllPlatformVersions();
 
-        return view('version-platform-manager::admin.whats-new.create', compact('versions', 'types'));
+        return view('version-platform-manager::admin.whats-new.create', compact('versions'));
     }
 
     /**
      * Store a newly created what's new content.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreWhatsNewRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'platform_version_id' => 'required|exists:platform_versions,id',
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'type' => 'required|in:feature,improvement,bugfix,security,deprecation',
-            'is_active' => 'boolean',
-            'sort_order' => 'nullable|integer|min:0',
-        ]);
+        $validated = $request->validated();
+        
+        // Set default sort order if not provided
+        if (empty($validated['sort_order'])) {
+            $validated['sort_order'] = $this->whatsNewRepository->getNextSortOrder($validated['platform_version_id']);
+        }
 
-        $this->versionService->createWhatsNew($validated);
+        $this->whatsNewRepository->create($validated);
 
-        return redirect()->route('admin.whats-new.index')
+        return redirect()->route('version-manager.whats-new.index')
             ->with('success', 'What\'s new content created successfully.');
     }
 
@@ -62,29 +62,21 @@ class WhatsNewController extends Controller
      */
     public function edit(WhatsNew $whatsNew)
     {
-        $versions = PlatformVersion::active()->orderBy('version', 'desc')->get();
-        $types = config('version-platform-manager.feature_types', []);
+        $versions = $this->whatsNewRepository->getAllPlatformVersions();
 
-        return view('version-platform-manager::admin.whats-new.edit', compact('whatsNew', 'versions', 'types'));
+        return view('version-platform-manager::admin.whats-new.edit', compact('whatsNew', 'versions'));
     }
 
     /**
      * Update the specified what's new content.
      */
-    public function update(Request $request, WhatsNew $whatsNew): RedirectResponse
+    public function update(UpdateWhatsNewRequest $request, WhatsNew $whatsNew): RedirectResponse
     {
-        $validated = $request->validate([
-            'platform_version_id' => 'required|exists:platform_versions,id',
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'type' => 'required|in:feature,improvement,bugfix,security,deprecation',
-            'is_active' => 'boolean',
-            'sort_order' => 'nullable|integer|min:0',
-        ]);
+        $validated = $request->validated();
 
-        $whatsNew->update($validated);
+        $this->whatsNewRepository->update($whatsNew, $validated);
 
-        return redirect()->route('admin.whats-new.index')
+        return redirect()->route('version-manager.whats-new.index')
             ->with('success', 'What\'s new content updated successfully.');
     }
 
@@ -93,9 +85,62 @@ class WhatsNewController extends Controller
      */
     public function destroy(WhatsNew $whatsNew): RedirectResponse
     {
-        $whatsNew->delete();
+        $this->whatsNewRepository->delete($whatsNew);
 
-        return redirect()->route('admin.whats-new.index')
+        return redirect()->route('version-manager.whats-new.index')
             ->with('success', 'What\'s new content deleted successfully.');
+    }
+
+    /**
+     * Export all what's new entries for a given version as a Markdown file.
+     */
+    public function exportMarkdown(Request $request, $platformVersionId)
+    {
+        $version = PlatformVersion::findOrFail($platformVersionId);
+        $entries = $this->whatsNewRepository->forPlatformVersionId($platformVersionId);
+
+        $md = "# What's New for Version {$version->version}\n\n";
+        foreach ($entries as $entry) {
+            $md .= "## {$entry->title}\n";
+            $md .= "**Type:** " . ucfirst($entry->type) . "\n\n";
+            $md .= trim($entry->content) . "\n\n";
+        }
+
+        $filename = 'whats-new-' . $version->version . '-' . date('Y-m-d_H-i-s') . '.md';
+        return response($md)
+            ->header('Content-Type', 'text/markdown')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+    }
+
+    /**
+     * Import what's new entries for a given version from a Markdown file.
+     */
+    public function importMarkdown(ImportMarkdownRequest $request, $platformVersionId)
+    {
+        $version = PlatformVersion::findOrFail($platformVersionId);
+        $content = file_get_contents($request->file('markdown_file')->getRealPath());
+
+        // Parse Markdown: ## Title, **Type:**, then content until next ## or end
+        $pattern = '/^##\s*(.+)\n\*\*Type:\*\*\s*(\w+)\n+([\s\S]*?)(?=^##\s|\z)/mU';
+        preg_match_all($pattern, $content, $matches, PREG_SET_ORDER);
+        
+        $entries = [];
+        foreach ($matches as $match) {
+            [$full, $title, $type, $entryContent] = $match;
+            $entryContent = trim($entryContent);
+            if (!$title || !$type || !$entryContent) continue;
+            
+            $entries[] = [
+                'title' => $title,
+                'content' => $entryContent,
+                'type' => strtolower($type),
+                'is_active' => true,
+            ];
+        }
+        
+        $imported = $this->whatsNewRepository->bulkCreate($entries, $version->id);
+        
+        return redirect()->route('version-manager.whats-new.index')
+            ->with('success', "Imported $imported entries from Markdown.");
     }
 } 

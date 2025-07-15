@@ -11,6 +11,11 @@ class PlatformVersion extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /**
+     * The table associated with the model.
+     */
+    protected $table = 'platform_versions';
+
     protected $fillable = [
         'version',
         'title',
@@ -80,5 +85,13 @@ class PlatformVersion extends Model
     public function isOlderThan(string $version): bool
     {
         return version_compare($this->version, $version, '<');
+    }
+
+    /**
+     * Get the What's New markdown content.
+     */
+    public function getWhatsNewMarkdownAttribute(): string
+    {
+        return $this->metadata['whats_new_markdown'] ?? '';
     }
 } 
