@@ -7,11 +7,20 @@ use LaravelPlus\VersionPlatformManager\Http\Controllers\UserController;
 use LaravelPlus\VersionPlatformManager\Http\Controllers\AnalyticsController;
 use LaravelPlus\VersionPlatformManager\Http\Controllers\DashboardController;
 use LaravelPlus\VersionPlatformManager\Http\Controllers\PublicWhatsNewController;
+use LaravelPlus\VersionPlatformManager\Http\Controllers\VersionAcknowledgmentController;
 
 Route::middleware(['web', 'auth'])->group(function () {
     // Mark version as seen
     Route::post('/version-platform-manager/mark-seen', [VersionController::class, 'markSeen'])
         ->name('version-platform-manager.mark-seen');
+    
+    // Version acknowledgment routes
+    Route::post('/version-platform-manager/mark-as-read', [VersionAcknowledgmentController::class, 'markAsRead'])
+        ->name('version-platform-manager.mark-as-read');
+    Route::post('/version-platform-manager/skip', [VersionAcknowledgmentController::class, 'skip'])
+        ->name('version-platform-manager.skip');
+    Route::get('/version-platform-manager/should-show-update', [VersionAcknowledgmentController::class, 'shouldShowUpdate'])
+        ->name('version-platform-manager.should-show-update');
 
     // Version Manager Admin routes
     Route::prefix(config('version-platform-manager.admin.route_prefix', 'admin/version-manager'))
@@ -26,9 +35,11 @@ Route::middleware(['web', 'auth'])->group(function () {
                 Route::get('/', [VersionController::class, 'index'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.index');
                 Route::get('/create', [VersionController::class, 'create'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.create');
                 Route::post('/', [VersionController::class, 'store'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.store');
+                Route::get('/{version}', [VersionController::class, 'show'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.show');
                 Route::get('/{version}/edit', [VersionController::class, 'edit'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.edit');
                 Route::put('/{version}', [VersionController::class, 'update'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.update');
                 Route::delete('/{version}', [VersionController::class, 'destroy'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.destroy');
+                Route::get('/next-version', [VersionController::class, 'getNextVersion'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.next-version');
             });
 
             // Users
@@ -69,4 +80,11 @@ Route::middleware(['web', 'auth'])->group(function () {
     // Mark as read route for public whats-new page
     Route::post('/whats-new/mark-read', [PublicWhatsNewController::class, 'markAsRead'])
         ->name('version-platform-manager.whats-new.mark-read');
+});
+
+// Example page to test version update modal
+Route::middleware(['web', 'auth', 'version.updates'])->group(function () {
+    Route::get('/version-example', function () {
+        return view('version-platform-manager::example');
+    })->name('version-platform-manager.example');
 }); 

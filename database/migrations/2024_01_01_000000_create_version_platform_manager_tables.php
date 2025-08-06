@@ -34,8 +34,10 @@ return new class extends Migration
         Schema::create('whats_new', function (Blueprint $table) {
             $table->id();
             $table->foreignId('platform_version_id')->constrained()->onDelete('cascade');
+            $table->string('title');
             $table->text('content');
             $table->enum('type', ['feature', 'improvement', 'bugfix', 'security', 'deprecation'])->default('feature');
+            $table->enum('status', ['draft', 'private', 'published'])->default('draft');
             $table->boolean('is_active')->default(true);
             $table->integer('sort_order')->default(0);
             $table->json('metadata')->nullable();

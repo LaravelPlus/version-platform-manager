@@ -18,8 +18,10 @@ class WhatsNew extends Model
 
     protected $fillable = [
         'platform_version_id',
+        'title',
         'content',
         'type',
+        'status',
         'is_active',
         'sort_order',
         'metadata',

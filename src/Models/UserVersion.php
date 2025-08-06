@@ -37,6 +37,14 @@ class UserVersion extends Model
     }
 
     /**
+     * Get the platform version this user version relates to.
+     */
+    public function platformVersion(): BelongsTo
+    {
+        return $this->belongsTo(PlatformVersion::class, 'version', 'version');
+    }
+
+    /**
      * Scope to get users with version older than the given version.
      */
     public function scopeOlderThan($query, string $version)

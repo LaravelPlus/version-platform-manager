@@ -155,26 +155,44 @@ class VersionService
      */
     public function getVersionStatistics(): array
     {
-        $totalUsers = UserVersion::count();
+        $totalUsers = \App\Models\User::count();
+        $userVersions = UserVersion::count();
         $latestVersion = $this->getLatestPlatformVersion();
         
         if (!$latestVersion) {
             return [
                 'total_users' => $totalUsers,
+                'users_with_versions' => $userVersions,
                 'users_on_latest' => 0,
                 'users_needing_update' => 0,
                 'latest_version' => null,
+                'total_versions' => PlatformVersion::count(),
+                'active_versions' => PlatformVersion::where('is_active', true)->count(),
+                'total_features' => WhatsNew::count(),
+                'published_features' => WhatsNew::where('status', 'published')->count(),
+                'adoption_rate' => 0,
             ];
         }
 
         $usersOnLatest = UserVersion::where('version', $latestVersion->version)->count();
-        $usersNeedingUpdate = UserVersion::olderThan($latestVersion->version)->count();
+        $usersNeedingUpdate = UserVersion::where('version', '<', $latestVersion->version)->count();
+        $activeUsers = UserVersion::where('last_seen_at', '>=', now()->subDays(30))->count();
+        
+        // Calculate adoption rate based on users with version data, not total users
+        $adoptionRate = $userVersions > 0 ? round(($usersOnLatest / $userVersions) * 100, 1) : 0;
 
         return [
             'total_users' => $totalUsers,
+            'users_with_versions' => $userVersions,
             'users_on_latest' => $usersOnLatest,
             'users_needing_update' => $usersNeedingUpdate,
+            'active_users' => $activeUsers,
             'latest_version' => $latestVersion->version,
+            'total_versions' => PlatformVersion::count(),
+            'active_versions' => PlatformVersion::where('is_active', true)->count(),
+            'total_features' => WhatsNew::count(),
+            'published_features' => WhatsNew::where('status', 'published')->count(),
+            'adoption_rate' => $adoptionRate,
         ];
     }
 

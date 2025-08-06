@@ -20,8 +20,14 @@ class UserController extends Controller
      */
     public function index(): View
     {
-        $users = $this->userRepository->paginate(20);
-        return view('version-platform-manager::admin.users.index', compact('users'));
+        $users = \App\Models\User::with(['userVersion'])
+            ->orderBy('name')
+            ->paginate(20);
+            
+        // Get latest platform version for comparison
+        $latestVersion = \LaravelPlus\VersionPlatformManager\Models\PlatformVersion::orderBy('version', 'desc')->first();
+        
+        return view('version-platform-manager::admin.users.index', compact('users', 'latestVersion'));
     }
 
     /**

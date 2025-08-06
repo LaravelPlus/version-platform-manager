@@ -38,12 +38,12 @@ class AnalyticsService
      */
     private function getMetrics(): array
     {
-        $totalUsers = $this->userRepository->all()->count();
-        $userVersions = $this->userVersionRepository->all();
+        $totalUsers = \App\Models\User::count();
+        $userVersions = \LaravelPlus\VersionPlatformManager\Models\UserVersion::all();
         $activeUsers = $userVersions->where('last_seen_at', '>=', now()->subDays(30))->count();
         
         // Calculate adoption rate (users with latest version)
-        $latestVersion = $this->platformVersionRepository->all()->sortByDesc('version')->first();
+        $latestVersion = \LaravelPlus\VersionPlatformManager\Models\PlatformVersion::orderBy('version', 'desc')->first();
         $adoptionRate = $latestVersion ? 
             ($userVersions->where('version', $latestVersion->version)->count() / max($totalUsers, 1)) * 100 : 0;
         
@@ -65,7 +65,7 @@ class AnalyticsService
      */
     private function getVersionAdoption(): array
     {
-        $userVersions = $this->userVersionRepository->all();
+        $userVersions = \LaravelPlus\VersionPlatformManager\Models\UserVersion::all();
         $totalUsers = $userVersions->count();
         
         if ($totalUsers === 0) {
@@ -92,7 +92,7 @@ class AnalyticsService
      */
     private function getUserActivity(): array
     {
-        $userVersions = $this->userVersionRepository->all();
+        $userVersions = \LaravelPlus\VersionPlatformManager\Models\UserVersion::all();
         $totalUsers = $userVersions->count();
         
         if ($totalUsers === 0) {
@@ -127,19 +127,17 @@ class AnalyticsService
      */
     private function getUpdateNotifications(): array
     {
-        $platformVersions = $this->platformVersionRepository->all()
-            ->where('is_active', true)
-            ->sortByDesc('released_at')
-            ->take(5);
+        $platformVersions = \LaravelPlus\VersionPlatformManager\Models\PlatformVersion::where('is_active', true)
+            ->orderBy('released_at', 'desc')
+            ->take(5)
+            ->get();
 
         return $platformVersions->map(function ($version, $index) {
             return [
                 'id' => $index + 1,
                 'version' => $version->version,
                 'date' => $version->released_at?->format('Y-m-d') ?? 'N/A',
-                'sent' => $this->userVersionRepository->all()
-                    ->where('version', $version->version)
-                    ->count(),
+                'sent' => \LaravelPlus\VersionPlatformManager\Models\UserVersion::where('version', $version->version)->count(),
             ];
         })->toArray();
     }
@@ -149,10 +147,11 @@ class AnalyticsService
      */
     private function getTopUsers(): array
     {
-        $userVersions = $this->userVersionRepository->all()
+        $userVersions = \LaravelPlus\VersionPlatformManager\Models\UserVersion::with('user')
             ->whereNotNull('last_seen_at')
-            ->sortByDesc('last_seen_at')
-            ->take(5);
+            ->orderBy('last_seen_at', 'desc')
+            ->take(5)
+            ->get();
 
         return $userVersions->map(function ($userVersion, $index) {
             $user = $userVersion->user;
@@ -173,10 +172,10 @@ class AnalyticsService
         $activities = collect();
         
         // Add version releases
-        $recentVersions = $this->platformVersionRepository->all()
-            ->where('is_active', true)
-            ->sortByDesc('released_at')
-            ->take(3);
+        $recentVersions = \LaravelPlus\VersionPlatformManager\Models\PlatformVersion::where('is_active', true)
+            ->orderBy('released_at', 'desc')
+            ->take(3)
+            ->get();
             
         foreach ($recentVersions as $version) {
             $activities->push([
@@ -188,10 +187,10 @@ class AnalyticsService
         }
 
         // Add recent user version updates
-        $recentUserVersions = $this->userVersionRepository->all()
-            ->whereNotNull('last_seen_at')
-            ->sortByDesc('last_seen_at')
-            ->take(2);
+        $recentUserVersions = \LaravelPlus\VersionPlatformManager\Models\UserVersion::whereNotNull('last_seen_at')
+            ->orderBy('last_seen_at', 'desc')
+            ->take(2)
+            ->get();
             
         foreach ($recentUserVersions as $userVersion) {
             $activities->push([

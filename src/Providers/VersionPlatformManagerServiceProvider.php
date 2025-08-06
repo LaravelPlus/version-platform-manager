@@ -66,6 +66,9 @@ class VersionPlatformManagerServiceProvider extends ServiceProvider
         // Load routes
         $this->loadRoutesFrom(__DIR__.'/../../routes/web.php');
 
+        // Register middleware
+        $this->registerMiddleware();
+
         // Register commands
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -79,12 +82,21 @@ class VersionPlatformManagerServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register middleware.
+     */
+    protected function registerMiddleware(): void
+    {
+        $this->app['router']->aliasMiddleware('version.updates', \LaravelPlus\VersionPlatformManager\Middleware\CheckVersionUpdates::class);
+    }
+
+    /**
      * Register Blade components.
      */
     protected function registerBladeComponents(): void
     {
         $this->loadViewComponentsAs('version-platform-manager', [
             \LaravelPlus\VersionPlatformManager\View\Components\WhatsNew::class,
+            \LaravelPlus\VersionPlatformManager\View\Components\VersionUpdateModal::class,
         ]);
     }
 } 
