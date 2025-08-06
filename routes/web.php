@@ -6,7 +6,7 @@ use LaravelPlus\VersionPlatformManager\Http\Controllers\WhatsNewController;
 use LaravelPlus\VersionPlatformManager\Http\Controllers\UserController;
 use LaravelPlus\VersionPlatformManager\Http\Controllers\AnalyticsController;
 use LaravelPlus\VersionPlatformManager\Http\Controllers\DashboardController;
-use LaravelPlus\VersionPlatformManager\Http\Controllers\PublicWhatsNewController;
+use LaravelPlus\VersionPlatformManager\Http\Controllers\WhatsNewPageController;
 use LaravelPlus\VersionPlatformManager\Http\Controllers\VersionAcknowledgmentController;
 
 Route::middleware(['web', 'auth'])->group(function () {
@@ -72,19 +72,12 @@ Route::middleware(['web', 'auth'])->group(function () {
         });
 });
 
-// Standalone public What's New page (requires authentication)
-Route::middleware(['web', 'auth'])->group(function () {
-    Route::get(config('version-platform-manager.public_whats_new.url', 'whats-new'), [PublicWhatsNewController::class, 'index'])
+// Standalone What's New page (requires authentication)
+Route::middleware(['web'])->group(function () {
+    Route::get(config('version-platform-manager.public_whats_new.url', 'whats-new'), [WhatsNewPageController::class, 'index'])
         ->name('version-platform-manager.whats-new.public');
 
-    // Mark as read route for public whats-new page
-    Route::post('/whats-new/mark-read', [PublicWhatsNewController::class, 'markAsRead'])
+    // Mark as read route for whats-new page
+    Route::post('/whats-new/mark-read', [WhatsNewPageController::class, 'markAsRead'])
         ->name('version-platform-manager.whats-new.mark-read');
 });
-
-// Example page to test version update modal
-Route::middleware(['web', 'auth', 'version.updates'])->group(function () {
-    Route::get('/version-example', function () {
-        return view('version-platform-manager::example');
-    })->name('version-platform-manager.example');
-}); 

@@ -8,33 +8,46 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use LaravelPlus\VersionPlatformManager\Services\VersionService;
+use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
 use Illuminate\Support\Facades\Route;
 
-class PublicWhatsNewController extends Controller
+class WhatsNewPageController extends Controller
 {
     public function __construct(
         private VersionService $versionService
-    ) {}
+    ) {
+        $this->middleware('auth');
+    }
 
     /**
-     * Display the public whats-new page.
+     * Display the changelog page.
      */
     public function index(): View
     {
         // Check if user is authenticated, if not redirect to login
-        if (!auth()->check()) {
-            return redirect()->route('login');
-        }
+        // if (!auth()->check()) {
+        //     return redirect()->route('login');
+        // }
 
         $user = auth()->user();
         $userVersion = $this->versionService->getUserVersion($user);
-        $latestVersion = $this->versionService->getLatestPlatformVersion();
-        $whatsNew = $this->versionService->getWhatsNewForUser($user);
+        
+        // Get only published versions with their published features, ordered by release date descending
+        $versions = PlatformVersion::with(['whatsNew' => function($query) {
+            $query->where('status', 'published')->orderBy('sort_order', 'asc');
+        }])
+        ->where('is_active', true) // Only show published versions
+        ->orderBy('released_at', 'desc')
+        ->orderBy('version', 'desc')
+        ->get();
+
+        // Get the latest version for comparison
+        $latestVersion = $versions->first();
 
         return view('version-platform-manager::whats-new.page', compact(
             'userVersion',
             'latestVersion',
-            'whatsNew'
+            'versions'
         ));
     }
 
@@ -53,7 +66,7 @@ class PublicWhatsNewController extends Controller
         ]);
 
         $user = auth()->user();
-        $version = \LaravelPlus\VersionPlatformManager\Models\PlatformVersion::find($validated['version_id']);
+        $version = PlatformVersion::find($validated['version_id']);
         
         if ($version) {
             // Update the user's actual version to the latest version
@@ -70,7 +83,7 @@ class PublicWhatsNewController extends Controller
             ]);
         }
 
-        // Always redirect to home route after marking as read
-        return redirect()->route('home')->with('success', 'Marked as read successfully.');
+        // Redirect back to whats-new page after marking as read
+        return redirect()->route('version-platform-manager.whats-new.public')->with('success', 'Marked as read successfully.');
     }
 } 

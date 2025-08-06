@@ -33,11 +33,11 @@
                             <!-- Import Section -->
                             <div class="px-4 py-3 border-b border-gray-200">
                                 <h3 class="text-sm font-medium text-gray-900 mb-2">Import Features</h3>
-                                <form action="{{ route('version-manager.whats-new.import-markdown', ['platformVersion' => 'SELECT']) }}" method="POST" enctype="multipart/form-data" id="importForm">
+                                <form method="POST" enctype="multipart/form-data" id="importForm">
                                     @csrf
                                     <div class="mb-3">
                                         <label class="block text-xs font-medium text-gray-700 mb-1">Select Version</label>
-                                        <select name="platform_version_id" required class="w-full px-2 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                        <select name="platform_version_id" required class="w-full px-2 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" id="importVersionSelect">
                                             <option value="">Choose a version...</option>
                                             @foreach($versions as $version)
                                                 <option value="{{ $version->id }}">{{ $version->version }} - {{ $version->title }}</option>
@@ -57,10 +57,10 @@
                             <!-- Export Section -->
                             <div class="px-4 py-3">
                                 <h3 class="text-sm font-medium text-gray-900 mb-2">Export Features</h3>
-                                <form action="{{ route('version-manager.whats-new.export-markdown', ['platformVersion' => 'SELECT']) }}" method="GET" id="exportForm">
+                                <form method="GET" id="exportForm">
                                     <div class="mb-3">
                                         <label class="block text-xs font-medium text-gray-700 mb-1">Select Version</label>
-                                        <select name="platform_version_id" required class="w-full px-2 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                        <select name="platform_version_id" required class="w-full px-2 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" id="exportVersionSelect">
                                             <option value="">Choose a version...</option>
                                             @foreach($versions as $version)
                                                 <option value="{{ $version->id }}">{{ $version->version }} - {{ $version->title }}</option>
@@ -376,10 +376,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Update the form action with the selected version
-        const currentAction = importForm.action;
-        const newAction = currentAction.replace('/SELECT', '/' + versionSelect.value);
-        importForm.action = newAction;
+        // Set the form action with the selected version
+        importForm.action = '{{ route("version-manager.whats-new.import-markdown", ["platformVersion" => "PLACEHOLDER"]) }}'.replace('PLACEHOLDER', versionSelect.value);
     });
     
     // Export form
@@ -391,10 +389,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Update the form action with the selected version
-        const currentAction = exportForm.action;
-        const newAction = currentAction.replace('/SELECT', '/' + versionSelect.value);
-        exportForm.action = newAction;
+        // Set the form action with the selected version
+        exportForm.action = '{{ route("version-manager.whats-new.export-markdown", ["platformVersion" => "PLACEHOLDER"]) }}'.replace('PLACEHOLDER', versionSelect.value);
     });
 });
 </script>

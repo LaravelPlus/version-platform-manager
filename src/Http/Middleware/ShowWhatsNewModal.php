@@ -16,6 +16,7 @@ class ShowWhatsNewModal
             'admin*',
             'api*',
             'login',
+            'whats-new',
             'register',
             'password/*',
         ]);
@@ -34,11 +35,6 @@ class ShowWhatsNewModal
                 // Avoid redirect loop
                 if (!$onWhatsNewPage) {
                     return redirect($whatsNewUrl);
-                }
-            } else {
-                // If already read and on whats-new page, redirect to home
-                if ($onWhatsNewPage) {
-                    return redirect()->route('home');
                 }
             }
         }

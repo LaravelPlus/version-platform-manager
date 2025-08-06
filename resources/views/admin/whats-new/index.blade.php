@@ -1,225 +1,314 @@
-@extends('layouts.admin')
+@extends('version-platform-manager::layouts.admin')
 
-@section('title', 'What\'s New Management')
+@section('page-title', 'What\'s New Features')
+
+@section('title', 'What\'s New Features')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">What's New Management</h1>
-        <a href="{{ route('version-manager.whats-new.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Add New Entry
-        </a>
-    </div>
-
-    <!-- Filters -->
-    <div class="bg-white shadow rounded-lg mb-6">
-        <div class="px-4 py-5 sm:p-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label for="version-filter" class="block text-sm font-medium text-gray-700 mb-1">Version</label>
-                    <select id="version-filter" v-model="filters.version" @change="filterContent" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">All Versions</option>
-                        <option v-for="version in versions" :key="version.id" :value="version.id">@{{ version.version }} - @{{ version.title }}</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="type-filter" class="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                    <select id="type-filter" v-model="filters.type" @change="filterContent" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">All Types</option>
-                        <option value="feature">Feature</option>
-                        <option value="improvement">Improvement</option>
-                        <option value="bugfix">Bug Fix</option>
-                        <option value="security">Security</option>
-                        <option value="deprecation">Deprecation</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select id="status-filter" v-model="filters.status" @change="filterContent" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">All Status</option>
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button @click="clearFilters" class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Clear Filters
-                    </button>
-                </div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">What's New Features</h1>
+                <p class="mt-2 text-sm text-gray-600">Manage all version features and updates</p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <a href="{{ route('version-manager.whats-new.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Create Feature
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Content List -->
-    <div class="bg-white shadow rounded-lg">
-        <div class="px-4 py-5 sm:p-6">
-            <div v-if="loading" class="flex justify-center items-center py-8">
-                <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-            </div>
-            
-            <div v-else-if="filteredContent.length === 0" class="text-center py-8">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">No content found</h3>
-                <p class="mt-1 text-sm text-gray-500">Get started by creating a new "What's New" entry.</p>
-                <div class="mt-6">
-                    <a href="{{ route('version-manager.whats-new.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        Add New Entry
-                    </a>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Features</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ $totalFeatures }}</dd>
+                        </dl>
+                    </div>
                 </div>
             </div>
-            
-            <div v-else class="space-y-4">
-                <div v-for="item in filteredContent" :key="item.id" class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-3 mb-2">
-                                <span :class="getTypeBadgeClass(item.type)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
-                                    @{{ getTypeIcon(item.type) }} @{{ getTypeLabel(item.type) }}
-                                </span>
-                                <span v-if="item.is_active" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    Active
-                                </span>
-                                <span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                    Inactive
-                                </span>
-                            </div>
-                            <h3 class="text-lg font-medium text-gray-900 mb-1">@{{ item.title }}</h3>
-                            <p class="text-sm text-gray-600 mb-2">@{{ item.content }}</p>
-                            <div class="flex items-center space-x-4 text-sm text-gray-500">
-                                <span>Version: @{{ getVersionLabel(item.platform_version_id) }}</span>
-                                <span>Order: @{{ item.sort_order }}</span>
-                                <span>Created: @{{ formatDate(item.created_at) }}</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-2 ml-4">
-                            <a :href="`/admin/version-manager/whats-new/${item.id}/edit`" class="text-blue-600 hover:text-blue-900 text-sm font-medium">
-                                Edit
-                            </a>
-                            <button @click="deleteItem(item.id)" class="text-red-600 hover:text-red-900 text-sm font-medium">
-                                Delete
-                            </button>
-                        </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Published</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ $publishedFeatures }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Draft</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ $draftFeatures }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Versions</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ $totalVersions }}</dd>
+                        </dl>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Filters -->
+    <div class="bg-white shadow rounded-lg mb-6">
+        <div class="px-4 py-5 sm:p-6">
+            <form method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-4">
+                <div>
+                    <label for="version" class="block text-sm font-medium text-gray-700">Version</label>
+                    <select name="version" id="version" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="">All Versions</option>
+                        @foreach($versions as $version)
+                            <option value="{{ $version->id }}" {{ request('version') == $version->id ? 'selected' : '' }}>
+                                {{ $version->version }} - {{ $version->title }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
+                    <select name="type" id="type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="">All Types</option>
+                        <option value="feature" {{ request('type') == 'feature' ? 'selected' : '' }}>Feature</option>
+                        <option value="improvement" {{ request('type') == 'improvement' ? 'selected' : '' }}>Improvement</option>
+                        <option value="bugfix" {{ request('type') == 'bugfix' ? 'selected' : '' }}>Bug Fix</option>
+                        <option value="security" {{ request('type') == 'security' ? 'selected' : '' }}>Security</option>
+                        <option value="deprecation" {{ request('type') == 'deprecation' ? 'selected' : '' }}>Deprecation</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                    <select name="status" id="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="">All Status</option>
+                        <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+                        <option value="private" {{ request('status') == 'private' ? 'selected' : '' }}>Private</option>
+                        <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Published</option>
+                    </select>
+                </div>
+
+                <div class="flex items-end">
+                    <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Features Table -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        @if($features->count() > 0)
+            <ul class="divide-y divide-gray-200">
+                @foreach($features as $feature)
+                    <li>
+                        <div class="px-4 py-4 sm:px-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-medium
+                                            @if($feature->type === 'feature') bg-blue-500
+                                            @elseif($feature->type === 'improvement') bg-green-500
+                                            @elseif($feature->type === 'bugfix') bg-red-500
+                                            @elseif($feature->type === 'security') bg-yellow-500
+                                            @else bg-gray-500
+                                            @endif">
+                                            {{ strtoupper(substr($feature->type, 0, 1)) }}
+                                        </div>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="flex items-center">
+                                            <p class="text-sm font-medium text-gray-900">{{ $feature->title }}</p>
+                                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                @if($feature->status === 'published') bg-green-100 text-green-800
+                                                @elseif($feature->status === 'private') bg-yellow-100 text-yellow-800
+                                                @else bg-gray-100 text-gray-800
+                                                @endif">
+                                                {{ ucfirst($feature->status) }}
+                                            </span>
+                                        </div>
+                                        <div class="mt-1 flex items-center text-sm text-gray-500">
+                                            <span class="capitalize">{{ $feature->type }}</span>
+                                            <span class="mx-2">•</span>
+                                            <span>{{ $feature->platformVersion->version }}</span>
+                                            <span class="mx-2">•</span>
+                                            <span>{{ $feature->created_at->format('M j, Y') }}</span>
+                                        </div>
+                                        <p class="mt-2 text-sm text-gray-600 line-clamp-2">{{ Str::limit($feature->content, 150) }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <a href="{{ route('version-manager.whats-new.edit', $feature) }}" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </a>
+                                    <form method="POST" action="{{ route('version-manager.whats-new.destroy', $feature) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this feature?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+
+            <!-- Pagination -->
+            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    @if($features->onFirstPage())
+                        <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-500 bg-white cursor-not-allowed">
+                            Previous
+                        </span>
+                    @else
+                        <a href="{{ $features->previousPageUrl() }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Previous
+                        </a>
+                    @endif
+
+                    @if($features->hasMorePages())
+                        <a href="{{ $features->nextPageUrl() }}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Next
+                        </a>
+                    @else
+                        <span class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-500 bg-white cursor-not-allowed">
+                            Next
+                        </span>
+                    @endif
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Showing
+                            <span class="font-medium">{{ $features->firstItem() }}</span>
+                            to
+                            <span class="font-medium">{{ $features->lastItem() }}</span>
+                            of
+                            <span class="font-medium">{{ $features->total() }}</span>
+                            results
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            @if($features->onFirstPage())
+                                <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-not-allowed">
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            @else
+                                <a href="{{ $features->previousPageUrl() }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                            @endif
+
+                            @foreach($features->getUrlRange(1, $features->lastPage()) as $page => $url)
+                                @if($page == $features->currentPage())
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600">
+                                        {{ $page }}
+                                    </span>
+                                @else
+                                    <a href="{{ $url }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                        {{ $page }}
+                                    </a>
+                                @endif
+                            @endforeach
+
+                            @if($features->hasMorePages())
+                                <a href="{{ $features->nextPageUrl() }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                            @else
+                                <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-not-allowed">
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            @endif
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        @else
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No features found</h3>
+                <p class="mt-1 text-sm text-gray-500">Get started by creating a new feature.</p>
+                <div class="mt-6">
+                    <a href="{{ route('version-manager.whats-new.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Create Feature
+                    </a>
+                </div>
+            </div>
+        @endif
+    </div>
 </div>
-
-<script>
-const { createApp } = Vue;
-
-createApp({
-    data() {
-        return {
-            content: @json($whatsNew ?? []),
-            versions: @json($versions ?? []),
-            loading: false,
-            filters: {
-                version: '',
-                type: '',
-                status: ''
-            }
-        }
-    },
-    computed: {
-        filteredContent() {
-            let filtered = this.content;
-            
-            if (this.filters.version) {
-                filtered = filtered.filter(item => item.platform_version_id == this.filters.version);
-            }
-            
-            if (this.filters.type) {
-                filtered = filtered.filter(item => item.type === this.filters.type);
-            }
-            
-            if (this.filters.status !== '') {
-                filtered = filtered.filter(item => item.is_active == this.filters.status);
-            }
-            
-            return filtered.sort((a, b) => a.sort_order - b.sort_order);
-        }
-    },
-    methods: {
-        filterContent() {
-            // Filtering is handled by computed property
-        },
-        clearFilters() {
-            this.filters = {
-                version: '',
-                type: '',
-                status: ''
-            };
-        },
-        getTypeBadgeClass(type) {
-            const classes = {
-                'feature': 'bg-blue-100 text-blue-800',
-                'improvement': 'bg-green-100 text-green-800',
-                'bugfix': 'bg-yellow-100 text-yellow-800',
-                'security': 'bg-red-100 text-red-800',
-                'deprecation': 'bg-orange-100 text-orange-800'
-            };
-            return classes[type] || 'bg-gray-100 text-gray-800';
-        },
-        getTypeIcon(type) {
-            const icons = {
-                'feature': '🎉',
-                'improvement': '⚡',
-                'bugfix': '🐛',
-                'security': '🔒',
-                'deprecation': '⚠️'
-            };
-            return icons[type] || '📝';
-        },
-        getTypeLabel(type) {
-            return type.charAt(0).toUpperCase() + type.slice(1);
-        },
-        getVersionLabel(versionId) {
-            const version = this.versions.find(v => v.id == versionId);
-            return version ? `${version.version} - ${version.title}` : 'Unknown';
-        },
-        formatDate(dateString) {
-            if (!dateString) return '';
-            return new Date(dateString).toLocaleDateString();
-        },
-        async deleteItem(id) {
-            if (!confirm('Are you sure you want to delete this entry?')) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/admin/version-manager/whats-new/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (response.ok) {
-                    this.content = this.content.filter(item => item.id !== id);
-                } else {
-                    alert('Error deleting item');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error deleting item');
-            }
-        }
-    }
-}).mount('#whats-new-app');
-</script>
 @endsection 

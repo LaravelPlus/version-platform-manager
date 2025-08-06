@@ -21,12 +21,40 @@ class WhatsNewController extends Controller
     /**
      * Display a listing of what's new content.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $whatsNew = $this->whatsNewRepository->all();
-        $versions = $this->whatsNewRepository->getAllPlatformVersions();
+        $query = WhatsNew::with('platformVersion')->orderBy('created_at', 'desc');
+        
+        // Apply filters
+        if ($request->filled('version')) {
+            $query->where('platform_version_id', $request->version);
+        }
+        
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+        
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        
+        $features = $query->paginate(20);
+        $versions = PlatformVersion::orderBy('version', 'desc')->get();
+        
+        // Statistics
+        $totalFeatures = WhatsNew::count();
+        $publishedFeatures = WhatsNew::where('status', 'published')->count();
+        $draftFeatures = WhatsNew::where('status', 'draft')->count();
+        $totalVersions = PlatformVersion::count();
 
-        return view('version-platform-manager::admin.whats-new.index', compact('whatsNew', 'versions'));
+        return view('version-platform-manager::admin.whats-new.index', compact(
+            'features', 
+            'versions', 
+            'totalFeatures', 
+            'publishedFeatures', 
+            'draftFeatures', 
+            'totalVersions'
+        ));
     }
 
     /**
@@ -205,36 +233,67 @@ class WhatsNewController extends Controller
         $version = PlatformVersion::findOrFail($platformVersionId);
         $content = file_get_contents($request->file('markdown_file')->getRealPath());
 
+        // Log the content for debugging
+        \Log::info('Importing markdown content', ['content' => $content]);
+
         // Parse Markdown: ## Title, **Type:**, **Status:**, then content until next ## or end
-        $pattern = '/^##\s*(.+)\n\*\*Type:\*\*\s*(\w+)(?:\n\*\*Status:\*\*\s*(\w+))?\n+([\s\S]*?)(?=^##\s|\z)/mU';
+        $pattern = '/^##\s*(.+?)\s*\n\*\*Type:\*\*\s*(\w+)(?:\s*\n\*\*Status:\*\*\s*(\w+))?\s*\n+([\s\S]*?)(?=^##\s|\z)/mU';
         preg_match_all($pattern, $content, $matches, PREG_SET_ORDER);
+        
+        \Log::info('Regex matches found', ['count' => count($matches), 'matches' => $matches]);
         
         $entries = [];
         foreach ($matches as $match) {
             [$full, $title, $type, $status, $entryContent] = $match;
             $entryContent = trim($entryContent);
-            if (!$title || !$type || !$entryContent) continue;
+            if (!$title || !$type || !$entryContent) {
+                \Log::warning('Skipping invalid entry', ['title' => $title, 'type' => $type, 'content_length' => strlen($entryContent)]);
+                continue;
+            }
+            
+            // Validate and normalize status
+            $normalizedStatus = strtolower(trim($status ?? 'draft'));
+            if (!in_array($normalizedStatus, ['draft', 'private', 'published'])) {
+                $normalizedStatus = 'draft';
+            }
+            
+            // Validate and normalize type
+            $normalizedType = strtolower(trim($type));
+            if (!in_array($normalizedType, ['feature', 'improvement', 'bugfix', 'security', 'deprecation'])) {
+                $normalizedType = 'feature';
+            }
             
             $entries[] = [
-                'title' => $title,
+                'title' => trim($title),
                 'content' => $entryContent,
-                'type' => strtolower($type),
-                'status' => strtolower($status ?? 'draft'),
+                'type' => $normalizedType,
+                'status' => $normalizedStatus,
                 'platform_version_id' => $version->id,
             ];
         }
         
+        \Log::info('Processed entries', ['count' => count($entries), 'entries' => $entries]);
+        
         $imported = 0;
+        $errors = [];
         foreach ($entries as $entry) {
             try {
                 WhatsNew::create($entry);
                 $imported++;
+                \Log::info('Successfully imported feature', ['title' => $entry['title']]);
             } catch (\Exception $e) {
-                \Log::error('Failed to import feature: ' . $e->getMessage());
+                $error = 'Failed to import feature "' . $entry['title'] . '": ' . $e->getMessage();
+                \Log::error($error);
+                $errors[] = $error;
             }
         }
         
+        $message = "Successfully imported $imported features from Markdown file.";
+        if (!empty($errors)) {
+            $message .= " Errors: " . implode('; ', $errors);
+        }
+        
         return redirect()->route('version-manager.versions.show', $version)
-            ->with('success', "Successfully imported $imported features from Markdown file.");
+            ->with('success', $message);
     }
 } 

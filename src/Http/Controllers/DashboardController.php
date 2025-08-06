@@ -7,29 +7,29 @@ use Illuminate\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use LaravelPlus\VersionPlatformManager\Contracts\PlatformVersionRepositoryInterface;
-use LaravelPlus\VersionPlatformManager\Contracts\UserVersionRepositoryInterface;
+use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
+use LaravelPlus\VersionPlatformManager\Models\UserVersion;
+use App\Models\User;
 
 class DashboardController extends Controller
 {
-    public function __construct(
-        private PlatformVersionRepositoryInterface $platformVersionRepository,
-        private UserVersionRepositoryInterface $userVersionRepository
-    ) {}
-
     /**
      * Display the dashboard with statistics and recent activity.
      */
     public function index(): View
     {
         $statistics = [
-            'total_versions' => $this->platformVersionRepository->all()->count(),
-            'active_versions' => $this->platformVersionRepository->active()->count(),
-            'total_users' => $this->userVersionRepository->all()->count(),
-            'versions_this_month' => $this->platformVersionRepository->all()->where('created_at', '>=', now()->startOfMonth())->count(),
+            'total_versions' => PlatformVersion::count(),
+            'active_versions' => PlatformVersion::where('is_active', true)->count(),
+            'total_users' => User::count(),
+            'users_with_versions' => UserVersion::count(),
+            'versions_this_month' => PlatformVersion::where('created_at', '>=', now()->startOfMonth())->count(),
         ];
 
-        $recentVersions = $this->platformVersionRepository->all()->sortByDesc('created_at')->take(5);
+        $recentVersions = PlatformVersion::orderBy('created_at', 'desc')
+            ->with('whatsNew')
+            ->take(5)
+            ->get();
 
         return view('version-platform-manager::admin.dashboard', compact('statistics', 'recentVersions'));
     }
@@ -145,9 +145,9 @@ class DashboardController extends Controller
 
         // Check version manager statistics
         try {
-            $versionCount = $this->platformVersionRepository->all()->count();
-            $activeVersionCount = $this->platformVersionRepository->active()->count();
-            $userCount = $this->userVersionRepository->all()->count();
+            $versionCount = PlatformVersion::count();
+            $activeVersionCount = PlatformVersion::where('is_active', true)->count();
+            $userCount = User::count();
             
             $healthStatus['checks']['version_manager_stats'] = [
                 'status' => 'healthy',

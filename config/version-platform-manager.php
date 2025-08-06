@@ -90,6 +90,15 @@ return [
             'icon' => '<svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 9V7a5 5 0 0110 0v2m-1 4h-8" /></svg>',
             'target' => '_blank', // Optional: open in new tab
         ],
+
+        [
+            'label' => 'What\'s  new preview',
+            // You can use either 'route' or 'url' for custom links:
+            // 'route' => 'admin.logs',
+            'url' => '/whats-new',
+            'icon' => '<svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 9V7a5 5 0 0110 0v2m-1 4h-8" /></svg>',
+            'target' => '_blank', // Optional: open in new tab
+        ],
         // Example custom link:
         // [
         //     'label' => 'Logs',
@@ -152,10 +161,10 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Public What's New Page
+    | What's New Page
     |--------------------------------------------------------------------------
     |
-    | Configuration for the standalone public 'What's New' page.
+    | Configuration for the standalone 'What's New' page (requires authentication).
     |
     */
     'public_whats_new' => [

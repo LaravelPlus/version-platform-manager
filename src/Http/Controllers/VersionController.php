@@ -155,9 +155,10 @@ class VersionController extends Controller
         $validated = $request->validate([
             'version' => 'required|string|unique:platform_versions,version,' . $version->id,
             'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:500',
             'released_at' => 'nullable|date',
             'is_active' => 'boolean',
-            'whats_new_markdown' => 'required|string|max:2000',
+            'whats_new_markdown' => 'nullable|string|max:2000',
         ]);
 
         $version->update($validated);
