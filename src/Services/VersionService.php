@@ -160,11 +160,14 @@ class VersionService
         $latestVersion = $this->getLatestPlatformVersion();
         
         if (!$latestVersion) {
+            $activeUsers = UserVersion::where('last_seen_at', '>=', now()->subDays(30))->count();
+            
             return [
                 'total_users' => $totalUsers,
                 'users_with_versions' => $userVersions,
                 'users_on_latest' => 0,
                 'users_needing_update' => 0,
+                'active_users' => $activeUsers,
                 'latest_version' => null,
                 'total_versions' => PlatformVersion::count(),
                 'active_versions' => PlatformVersion::where('is_active', true)->count(),
