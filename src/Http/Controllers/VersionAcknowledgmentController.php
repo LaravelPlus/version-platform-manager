@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use LaravelPlus\VersionPlatformManager\Services\VersionService;
 
-class VersionAcknowledgmentController extends Controller
+final class VersionAcknowledgmentController extends Controller
 {
     public function __construct(
         private VersionService $versionService
@@ -26,7 +28,7 @@ class VersionAcknowledgmentController extends Controller
 
         // Update user's version
         $this->versionService->updateUserVersion($user, $version);
-        
+
         // Mark as seen
         $this->versionService->markVersionAsSeen($user, $version);
 
@@ -65,24 +67,24 @@ class VersionAcknowledgmentController extends Controller
     public function shouldShowUpdate(Request $request): JsonResponse
     {
         $user = auth()->user();
-        
+
         if (!$user) {
             return response()->json(['should_show' => false]);
         }
 
         $latestVersion = $this->versionService->getLatestPlatformVersion();
-        
+
         if (!$latestVersion) {
             return response()->json(['should_show' => false]);
         }
 
         // Check if user needs update
         $needsUpdate = $this->versionService->userNeedsUpdate($user);
-        
+
         // Check if already read or skipped via cookie
         $readCookie = $request->cookie('version_' . $latestVersion->version . '_read');
         $skippedCookie = $request->cookie('version_' . $latestVersion->version . '_skipped');
-        
+
         $shouldShow = $needsUpdate && !$readCookie && !$skippedCookie;
 
         return response()->json([
@@ -93,4 +95,4 @@ class VersionAcknowledgmentController extends Controller
             'markdown_content' => $latestVersion->getWhatsNewMarkdownAttribute(),
         ]);
     }
-} 
+}

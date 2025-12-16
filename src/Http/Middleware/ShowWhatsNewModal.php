@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use LaravelPlus\VersionPlatformManager\Services\VersionService;
 
-class ShowWhatsNewModal
+final class ShowWhatsNewModal
 {
     public function handle(Request $request, Closure $next)
     {
@@ -21,15 +22,13 @@ class ShowWhatsNewModal
             'password/*',
         ]);
 
-        $shouldCheck = $request->isMethod('get') && !collect($excluded)->contains(function ($pattern) use ($request) {
-            return $request->is($pattern);
-        });
+        $shouldCheck = $request->isMethod('get') && !collect($excluded)->contains(fn ($pattern) => $request->is($pattern));
 
         if ($shouldCheck && Auth::check()) {
             $versionService = app(VersionService::class);
             $userNeedsUpdate = $versionService->userNeedsUpdate(Auth::user());
-            $whatsNewUrl = '/' . ltrim(config('version-platform-manager.public_whats_new.url', 'whats-new'), '/');
-            $onWhatsNewPage = $request->path() === ltrim($whatsNewUrl, '/');
+            $whatsNewUrl = '/' . mb_ltrim(config('version-platform-manager.public_whats_new.url', 'whats-new'), '/');
+            $onWhatsNewPage = $request->path() === mb_ltrim($whatsNewUrl, '/');
 
             if ($userNeedsUpdate) {
                 // Avoid redirect loop
@@ -41,4 +40,4 @@ class ShowWhatsNewModal
 
         return $next($request);
     }
-} 
+}

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace LaravelPlus\VersionPlatformManager\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Illuminate\Http\Response;
+use Illuminate\View\View;
 use LaravelPlus\VersionPlatformManager\Services\AnalyticsService;
 
-class AnalyticsController extends Controller
+final class AnalyticsController extends Controller
 {
     public function __construct(
         private AnalyticsService $analyticsService
@@ -21,7 +21,7 @@ class AnalyticsController extends Controller
     public function index(): View
     {
         $analyticsData = $this->analyticsService->getAnalyticsData();
-        
+
         return view('version-platform-manager::admin.analytics.index', [
             'analyticsData' => $analyticsData,
         ]);
@@ -33,11 +33,11 @@ class AnalyticsController extends Controller
     public function export(Request $request): Response
     {
         $data = $this->analyticsService->getAnalyticsData();
-        
+
         $filename = 'analytics_' . date('Y-m-d_H-i-s') . '.json';
-        
+
         return response()->json($data)
             ->header('Content-Type', 'application/json')
             ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
     }
-} 
+}

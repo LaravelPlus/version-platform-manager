@@ -1,14 +1,15 @@
 <?php
+
 declare(strict_types=1);
 
 namespace LaravelPlus\VersionPlatformManager\Repositories;
 
-use LaravelPlus\VersionPlatformManager\Contracts\UserRepositoryInterface;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use App\Models\User;
+use LaravelPlus\VersionPlatformManager\Contracts\UserRepositoryInterface;
 
-class UserRepository implements UserRepositoryInterface
+final class UserRepository implements UserRepositoryInterface
 {
     public function all(): Collection
     {
@@ -39,4 +40,4 @@ class UserRepository implements UserRepositoryInterface
     {
         return $user->delete();
     }
-} 
+}

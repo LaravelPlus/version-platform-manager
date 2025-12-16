@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use LaravelPlus\VersionPlatformManager\Services\VersionService;
 use LaravelPlus\VersionPlatformManager\Console\Commands\CreatePlatformVersion;
 use LaravelPlus\VersionPlatformManager\Console\Commands\CreateWhatsNew;
+use LaravelPlus\VersionPlatformManager\Services\VersionService;
 
-class VersionPlatformManagerServiceProvider extends ServiceProvider
+final class VersionPlatformManagerServiceProvider extends ServiceProvider
 {
     /**
      * Register services.
@@ -18,23 +20,19 @@ class VersionPlatformManagerServiceProvider extends ServiceProvider
             __DIR__.'/../../config/version-platform-manager.php', 'version-platform-manager'
         );
 
-        $this->app->singleton(VersionService::class, function ($app) {
-            return new VersionService();
-        });
+        $this->app->singleton(VersionService::class, fn ($app) => new VersionService());
 
         $this->app->bind(\LaravelPlus\VersionPlatformManager\Contracts\PlatformVersionRepositoryInterface::class, \LaravelPlus\VersionPlatformManager\Repositories\PlatformVersionRepository::class);
         $this->app->bind(\LaravelPlus\VersionPlatformManager\Contracts\WhatsNewRepositoryInterface::class, \LaravelPlus\VersionPlatformManager\Repositories\WhatsNewRepository::class);
         $this->app->bind(\LaravelPlus\VersionPlatformManager\Contracts\UserVersionRepositoryInterface::class, \LaravelPlus\VersionPlatformManager\Repositories\UserVersionRepository::class);
         $this->app->bind(\LaravelPlus\VersionPlatformManager\Contracts\UserRepositoryInterface::class, \LaravelPlus\VersionPlatformManager\Repositories\UserRepository::class);
-        
+
         // Register AnalyticsService
-        $this->app->singleton(\LaravelPlus\VersionPlatformManager\Services\AnalyticsService::class, function ($app) {
-            return new \LaravelPlus\VersionPlatformManager\Services\AnalyticsService(
-                $app->make(\LaravelPlus\VersionPlatformManager\Contracts\UserRepositoryInterface::class),
-                $app->make(\LaravelPlus\VersionPlatformManager\Contracts\UserVersionRepositoryInterface::class),
-                $app->make(\LaravelPlus\VersionPlatformManager\Contracts\PlatformVersionRepositoryInterface::class)
-            );
-        });
+        $this->app->singleton(\LaravelPlus\VersionPlatformManager\Services\AnalyticsService::class, fn ($app) => new \LaravelPlus\VersionPlatformManager\Services\AnalyticsService(
+            $app->make(\LaravelPlus\VersionPlatformManager\Contracts\UserRepositoryInterface::class),
+            $app->make(\LaravelPlus\VersionPlatformManager\Contracts\UserVersionRepositoryInterface::class),
+            $app->make(\LaravelPlus\VersionPlatformManager\Contracts\PlatformVersionRepositoryInterface::class)
+        ));
     }
 
     /**
@@ -99,4 +97,4 @@ class VersionPlatformManagerServiceProvider extends ServiceProvider
             \LaravelPlus\VersionPlatformManager\View\Components\VersionUpdateModal::class,
         ]);
     }
-} 
+}

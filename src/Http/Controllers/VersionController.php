@@ -1,15 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
 namespace LaravelPlus\VersionPlatformManager\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
 use LaravelPlus\VersionPlatformManager\Services\VersionService;
+use Log;
 
-class VersionController extends Controller
+final class VersionController extends Controller
 {
     public function __construct(
         private VersionService $versionService
@@ -33,7 +35,7 @@ class VersionController extends Controller
     {
         $latestVersion = PlatformVersion::orderBy('version', 'desc')->first();
         $nextVersion = $latestVersion ? $this->incrementVersion($latestVersion->version) : '1.0.0';
-        
+
         // Calculate different increment types
         $nextVersions = [];
         if ($latestVersion) {
@@ -43,7 +45,7 @@ class VersionController extends Controller
                 'major' => $this->incrementVersion($latestVersion->version, 'major'),
             ];
         }
-        
+
         return view('version-platform-manager::admin.versions.create', compact('nextVersion', 'nextVersions', 'latestVersion'));
     }
 
@@ -53,8 +55,8 @@ class VersionController extends Controller
     public function store(Request $request): RedirectResponse
     {
         // Debug: Log the request data
-        \Log::info('Version creation request:', $request->all());
-        
+        Log::info('Version creation request:', $request->all());
+
         try {
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
@@ -63,7 +65,7 @@ class VersionController extends Controller
                 'version_type' => 'nullable|in:patch,minor,major',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Validation failed:', $e->errors());
+            Log::error('Validation failed:', $e->errors());
             throw $e;
         }
 
@@ -71,10 +73,10 @@ class VersionController extends Controller
         $latestVersion = PlatformVersion::orderBy('version', 'desc')->first();
         $versionType = $request->get('version_type', 'patch');
         $newVersionNumber = $latestVersion ? $this->incrementVersion($latestVersion->version, $versionType) : '1.0.0';
-        
+
         // Remove version_type from validated data as it's not a database column
         unset($validated['version_type']);
-        
+
         $validated['version'] = $newVersionNumber;
         // Convert is_active to boolean
         $validated['is_active'] = in_array($validated['is_active'], ['1', 'true', true], true); // Draft by default
@@ -85,7 +87,7 @@ class VersionController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Platform version created successfully.',
-                'redirect_url' => route('version-manager.versions.show', $version)
+                'redirect_url' => route('version-manager.versions.show', $version),
             ]);
         }
 
@@ -100,17 +102,17 @@ class VersionController extends Controller
     private function incrementVersion(string $currentVersion, string $type = 'patch'): string
     {
         $parts = explode('.', $currentVersion);
-        
+
         // Ensure we have 3 parts (major.minor.patch)
         while (count($parts) < 3) {
             $parts[] = '0';
         }
-        
+
         // Convert to integers
-        $major = (int)$parts[0];
-        $minor = (int)$parts[1];
-        $patch = (int)$parts[2];
-        
+        $major = (int) $parts[0];
+        $minor = (int) $parts[1];
+        $patch = (int) $parts[2];
+
         switch ($type) {
             case 'major':
                 $major++;
@@ -126,7 +128,7 @@ class VersionController extends Controller
                 $patch++;
                 break;
         }
-        
+
         return "{$major}.{$minor}.{$patch}";
     }
 
@@ -136,6 +138,7 @@ class VersionController extends Controller
     public function show(PlatformVersion $version): View
     {
         $features = $version->whatsNew()->orderBy('sort_order')->get();
+
         return view('version-platform-manager::admin.versions.show', compact('version', 'features'));
     }
 
@@ -198,11 +201,11 @@ class VersionController extends Controller
         $type = $request->get('type', 'patch'); // patch, minor, major
         $latestVersion = PlatformVersion::orderBy('version', 'desc')->first();
         $nextVersion = $latestVersion ? $this->incrementVersion($latestVersion->version, $type) : '1.0.0';
-        
+
         return response()->json([
             'next_version' => $nextVersion,
             'latest_version' => $latestVersion ? $latestVersion->version : null,
-            'type' => $type
+            'type' => $type,
         ]);
     }
 
@@ -219,4 +222,4 @@ class VersionController extends Controller
 
         return redirect()->back()->with('success', 'Version marked as seen.');
     }
-} 
+}

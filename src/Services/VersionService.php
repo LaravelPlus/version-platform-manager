@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Services;
 
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Collection;
 use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
 use LaravelPlus\VersionPlatformManager\Models\UserVersion;
 use LaravelPlus\VersionPlatformManager\Models\WhatsNew;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\Auth\Authenticatable;
 
-class VersionService
+final class VersionService
 {
     /**
      * Check if a user needs to see version updates.
@@ -90,9 +92,7 @@ class VersionService
             ->where('is_active', true)
             ->with(['activeWhatsNew'])
             ->get()
-            ->flatMap(function ($version) {
-                return $version->activeWhatsNew;
-            });
+            ->flatMap(fn ($version) => $version->activeWhatsNew);
     }
 
     /**
@@ -158,10 +158,10 @@ class VersionService
         $totalUsers = \App\Models\User::count();
         $userVersions = UserVersion::count();
         $latestVersion = $this->getLatestPlatformVersion();
-        
+
         if (!$latestVersion) {
             $activeUsers = UserVersion::where('last_seen_at', '>=', now()->subDays(30))->count();
-            
+
             return [
                 'total_users' => $totalUsers,
                 'users_with_versions' => $userVersions,
@@ -180,7 +180,7 @@ class VersionService
         $usersOnLatest = UserVersion::where('version', $latestVersion->version)->count();
         $usersNeedingUpdate = UserVersion::where('version', '<', $latestVersion->version)->count();
         $activeUsers = UserVersion::where('last_seen_at', '>=', now()->subDays(30))->count();
-        
+
         // Calculate adoption rate based on users with version data, not total users
         $adoptionRate = $userVersions > 0 ? round(($usersOnLatest / $userVersions) * 100, 1) : 0;
 
@@ -205,7 +205,7 @@ class VersionService
     public function getWhatsNewForVersion(string $version): Collection
     {
         $platformVersion = PlatformVersion::where('version', $version)->first();
-        
+
         if (!$platformVersion) {
             return collect();
         }
@@ -223,4 +223,4 @@ class VersionService
             ->ordered()
             ->get();
     }
-} 
+}

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Http\Requests\WhatsNew;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreWhatsNewRequest extends FormRequest
+final class StoreWhatsNewRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -63,4 +65,4 @@ class StoreWhatsNewRequest extends FormRequest
             'sort_order' => 'sort order',
         ];
     }
-} 
+}

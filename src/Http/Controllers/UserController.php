@@ -1,15 +1,16 @@
 <?php
+
 declare(strict_types=1);
 
 namespace LaravelPlus\VersionPlatformManager\Http\Controllers;
 
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Illuminate\Http\RedirectResponse;
 use LaravelPlus\VersionPlatformManager\Contracts\UserRepositoryInterface;
-use App\Models\User;
 
-class UserController extends Controller
+final class UserController extends Controller
 {
     public function __construct(
         private UserRepositoryInterface $userRepository
@@ -20,13 +21,13 @@ class UserController extends Controller
      */
     public function index(): View
     {
-        $users = \App\Models\User::with(['userVersion'])
+        $users = User::with(['userVersion'])
             ->orderBy('name')
             ->paginate(20);
-            
+
         // Get latest platform version for comparison
         $latestVersion = \LaravelPlus\VersionPlatformManager\Models\PlatformVersion::orderBy('version', 'desc')->first();
-        
+
         return view('version-platform-manager::admin.users.index', compact('users', 'latestVersion'));
     }
 
@@ -51,6 +52,7 @@ class UserController extends Controller
         ]);
         $validated['password'] = bcrypt($validated['password']);
         $this->userRepository->create($validated);
+
         return redirect()->route('version-manager.users.index')
             ->with('success', 'User created successfully.');
     }
@@ -60,7 +62,8 @@ class UserController extends Controller
      */
     public function edit($user): View
     {
-        $user = $this->userRepository->find((int)$user);
+        $user = $this->userRepository->find((int) $user);
+
         return view('version-platform-manager::admin.users.edit', compact('user'));
     }
 
@@ -69,7 +72,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $user): RedirectResponse
     {
-        $user = $this->userRepository->find((int)$user);
+        $user = $this->userRepository->find((int) $user);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -82,6 +85,7 @@ class UserController extends Controller
             unset($validated['password']);
         }
         $this->userRepository->update($user, $validated);
+
         return redirect()->route('version-manager.users.index')
             ->with('success', 'User updated successfully.');
     }
@@ -91,9 +95,10 @@ class UserController extends Controller
      */
     public function destroy($user): RedirectResponse
     {
-        $user = $this->userRepository->find((int)$user);
+        $user = $this->userRepository->find((int) $user);
         $this->userRepository->delete($user);
+
         return redirect()->route('version-manager.users.index')
             ->with('success', 'User deleted successfully.');
     }
-} 
+}

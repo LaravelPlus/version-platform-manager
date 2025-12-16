@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\View\Components;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Component;
 use LaravelPlus\VersionPlatformManager\Services\VersionService;
-use Illuminate\Support\Facades\Auth;
+use Log;
 
-class WhatsNew extends Component
+final class WhatsNew extends Component
 {
     public function __construct(
         public ?string $title = null,
@@ -54,8 +57,8 @@ class WhatsNew extends Component
         ];
 
         // Debug: Log the data being passed
-        \Log::info('WhatsNew component data:', $data);
+        Log::info('WhatsNew component data:', $data);
 
         return view('version-platform-manager::components.whats-new', $data);
     }
-} 
+}

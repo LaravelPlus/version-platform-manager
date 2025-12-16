@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Tests;
 
-use LaravelPlus\VersionPlatformManager\Services\VersionService;
+use App\Models\User;
 use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
 use LaravelPlus\VersionPlatformManager\Models\UserVersion;
 use LaravelPlus\VersionPlatformManager\Models\WhatsNew;
+use LaravelPlus\VersionPlatformManager\Services\VersionService;
 use Tests\TestCase;
-use App\Models\User;
 
-class VersionServiceTest extends TestCase
+final class VersionServiceTest extends TestCase
 {
     protected VersionService $versionService;
 
@@ -20,7 +22,7 @@ class VersionServiceTest extends TestCase
     }
 
     /** @test */
-    public function it_can_create_platform_version()
+    public function it_can_create_platform_version(): void
     {
         $data = [
             'version' => '1.0.0',
@@ -37,7 +39,7 @@ class VersionServiceTest extends TestCase
     }
 
     /** @test */
-    public function it_can_create_whats_new_content()
+    public function it_can_create_whats_new_content(): void
     {
         // Create a platform version first
         $platformVersion = PlatformVersion::create([
@@ -62,7 +64,7 @@ class VersionServiceTest extends TestCase
     }
 
     /** @test */
-    public function it_can_validate_version_format()
+    public function it_can_validate_version_format(): void
     {
         $this->assertTrue($this->versionService->isValidVersion('1.0.0'));
         $this->assertTrue($this->versionService->isValidVersion('2.1.5'));
@@ -71,7 +73,7 @@ class VersionServiceTest extends TestCase
     }
 
     /** @test */
-    public function it_can_compare_versions()
+    public function it_can_compare_versions(): void
     {
         $this->assertEquals(-1, $this->versionService->compareVersions('1.0.0', '1.1.0'));
         $this->assertEquals(1, $this->versionService->compareVersions('2.0.0', '1.9.9'));
@@ -79,10 +81,10 @@ class VersionServiceTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_user_version()
+    public function it_can_get_user_version(): void
     {
         $user = User::factory()->create();
-        
+
         $userVersion = $this->versionService->getUserVersion($user);
 
         $this->assertInstanceOf(UserVersion::class, $userVersion);
@@ -91,7 +93,7 @@ class VersionServiceTest extends TestCase
     }
 
     /** @test */
-    public function it_can_update_user_version()
+    public function it_can_update_user_version(): void
     {
         $user = User::factory()->create();
         $newVersion = '2.0.0';
@@ -101,4 +103,4 @@ class VersionServiceTest extends TestCase
         $userVersion = $this->versionService->getUserVersion($user);
         $this->assertEquals($newVersion, $userVersion->version);
     }
-} 
+}

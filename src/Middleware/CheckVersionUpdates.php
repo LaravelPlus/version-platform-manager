@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Middleware;
 
 use Closure;
@@ -7,7 +9,7 @@ use Illuminate\Http\Request;
 use LaravelPlus\VersionPlatformManager\Services\VersionService;
 use Symfony\Component\HttpFoundation\Response;
 
-class CheckVersionUpdates
+final class CheckVersionUpdates
 {
     public function __construct(
         private VersionService $versionService
@@ -32,15 +34,15 @@ class CheckVersionUpdates
         }
 
         $user = auth()->user();
-        
+
         // Check if user needs to see updates
         if ($this->versionService->userNeedsUpdate($user)) {
             $latestVersion = $this->versionService->getLatestPlatformVersion();
-            
+
             if ($latestVersion) {
                 // Get what's new content for the user
                 $whatsNew = $this->versionService->getWhatsNewForUser($user);
-                
+
                 // Share data with the view
                 view()->share('version_update_data', [
                     'version' => $latestVersion->version,
@@ -54,4 +56,4 @@ class CheckVersionUpdates
 
         return $next($request);
     }
-} 
+}

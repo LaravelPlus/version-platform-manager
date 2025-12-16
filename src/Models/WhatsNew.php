@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class WhatsNew extends Model
+final class WhatsNew extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -70,6 +72,7 @@ class WhatsNew extends Model
     public function getTypeLabelAttribute(): string
     {
         $types = config('version-platform-manager.feature_types', []);
+
         return $types[$this->type] ?? ucfirst($this->type);
     }
 
@@ -104,8 +107,8 @@ class WhatsNew extends Model
 
         // Get first line and check for emoji
         $lines = explode("\n", $this->content);
-        $firstLine = trim($lines[0] ?? '');
-        
+        $firstLine = mb_trim($lines[0] ?? '');
+
         foreach ($emojiTypeMap as $emoji => $type) {
             if (str_starts_with($firstLine, $emoji)) {
                 return $type;
@@ -121,12 +124,12 @@ class WhatsNew extends Model
     public function getTitleFromContent(): string
     {
         $lines = explode("\n", $this->content);
-        $firstLine = trim($lines[0] ?? '');
-        
+        $firstLine = mb_trim($lines[0] ?? '');
+
         // Remove emoji from start
         $emojiPattern = '/^[🎉⚡🐛🔒⚠️📝]\s*/u';
         $title = preg_replace($emojiPattern, '', $firstLine);
-        
+
         return $title ?: 'Untitled';
     }
 
@@ -136,11 +139,11 @@ class WhatsNew extends Model
     public function getContentWithoutTitle(): string
     {
         $lines = explode("\n", $this->content);
-        
+
         // Remove first line (title) and return rest
         array_shift($lines);
-        
-        return trim(implode("\n", $lines));
+
+        return mb_trim(implode("\n", $lines));
     }
 
     /**
@@ -149,10 +152,10 @@ class WhatsNew extends Model
     public function setContentAttribute($value): void
     {
         $this->attributes['content'] = $value;
-        
+
         // Auto-detect type if not set
         if (empty($this->attributes['type'])) {
             $this->attributes['type'] = $this->detectTypeFromContent();
         }
     }
-} 
+}

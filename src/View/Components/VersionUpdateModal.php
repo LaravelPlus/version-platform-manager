@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\View\Components;
 
 use Illuminate\View\Component;
 
-class VersionUpdateModal extends Component
+final class VersionUpdateModal extends Component
 {
     public function __construct()
     {
@@ -18,4 +20,4 @@ class VersionUpdateModal extends Component
     {
         return view('version-platform-manager::components.version-update-modal');
     }
-} 
+}

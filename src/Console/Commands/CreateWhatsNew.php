@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
-use LaravelPlus\VersionPlatformManager\Services\VersionService;
 use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
+use LaravelPlus\VersionPlatformManager\Services\VersionService;
 
-class CreateWhatsNew extends Command
+final class CreateWhatsNew extends Command
 {
     /**
      * The name and signature of the console command.
@@ -47,12 +50,14 @@ class CreateWhatsNew extends Command
 
         if (!$platformVersion) {
             $this->error("Platform version {$version} not found. Please create it first.");
+
             return 1;
         }
 
         $validTypes = ['feature', 'improvement', 'bugfix', 'security', 'deprecation'];
         if (!in_array($type, $validTypes)) {
-            $this->error("Invalid type. Must be one of: " . implode(', ', $validTypes));
+            $this->error('Invalid type. Must be one of: ' . implode(', ', $validTypes));
+
             return 1;
         }
 
@@ -67,10 +72,12 @@ class CreateWhatsNew extends Command
             ]);
 
             $this->info("What's new content created successfully for version {$version}!");
+
             return 0;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Failed to create what's new content: {$e->getMessage()}");
+
             return 1;
         }
     }
-} 
+}

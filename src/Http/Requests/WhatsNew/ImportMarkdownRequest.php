@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Http\Requests\WhatsNew;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ImportMarkdownRequest extends FormRequest
+final class ImportMarkdownRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -46,4 +48,4 @@ class ImportMarkdownRequest extends FormRequest
             'markdown_file' => 'markdown file',
         ];
     }
-} 
+}

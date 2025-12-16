@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Traits;
 
 use LaravelPlus\VersionPlatformManager\Models\UserVersion;
@@ -38,6 +40,7 @@ trait HasVersion
     public function needsVersionUpdate(): bool
     {
         $versionService = app(VersionService::class);
+
         return $versionService->userNeedsUpdate($this);
     }
 
@@ -47,6 +50,7 @@ trait HasVersion
     public function getWhatsNew()
     {
         $versionService = app(VersionService::class);
+
         return $versionService->getWhatsNewForUser($this);
     }
 
@@ -65,6 +69,7 @@ trait HasVersion
     public function isVersionOlderThan(string $version): bool
     {
         $currentVersion = $this->getCurrentVersion();
+
         return version_compare($currentVersion, $version, '<');
     }
 
@@ -74,6 +79,7 @@ trait HasVersion
     public function isVersionNewerThan(string $version): bool
     {
         $currentVersion = $this->getCurrentVersion();
+
         return version_compare($currentVersion, $version, '>');
     }
 
@@ -83,6 +89,7 @@ trait HasVersion
     public function isVersionEqualTo(string $version): bool
     {
         $currentVersion = $this->getCurrentVersion();
+
         return version_compare($currentVersion, $version, '=');
     }
-} 
+}

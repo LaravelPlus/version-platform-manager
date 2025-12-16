@@ -1,17 +1,19 @@
 <?php
+
 declare(strict_types=1);
 
 namespace LaravelPlus\VersionPlatformManager\Http\Controllers;
 
-use Illuminate\View\View;
+use App\Models\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\View\View;
 use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
 use LaravelPlus\VersionPlatformManager\Models\UserVersion;
-use App\Models\User;
 
-class DashboardController extends Controller
+final class DashboardController extends Controller
 {
     /**
      * Display the dashboard with statistics and recent activity.
@@ -42,7 +44,7 @@ class DashboardController extends Controller
         $healthStatus = [
             'timestamp' => now()->toISOString(),
             'overall_status' => 'healthy',
-            'checks' => []
+            'checks' => [],
         ];
 
         // Check database connection
@@ -50,12 +52,12 @@ class DashboardController extends Controller
             DB::connection()->getPdo();
             $healthStatus['checks']['database_connection'] = [
                 'status' => 'healthy',
-                'message' => 'Database connection successful'
+                'message' => 'Database connection successful',
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $healthStatus['checks']['database_connection'] = [
                 'status' => 'unhealthy',
-                'message' => 'Database connection failed: ' . $e->getMessage()
+                'message' => 'Database connection failed: ' . $e->getMessage(),
             ];
             $healthStatus['overall_status'] = 'unhealthy';
         }
@@ -63,9 +65,9 @@ class DashboardController extends Controller
         // Check required tables
         $requiredTables = [
             'platform_versions',
-            'whats_new', 
+            'whats_new',
             'user_versions',
-            'users'
+            'users',
         ];
 
         foreach ($requiredTables as $table) {
@@ -75,19 +77,19 @@ class DashboardController extends Controller
                     $healthStatus['checks']['table_' . $table] = [
                         'status' => 'healthy',
                         'message' => "Table exists with {$recordCount} records",
-                        'record_count' => $recordCount
+                        'record_count' => $recordCount,
                     ];
                 } else {
                     $healthStatus['checks']['table_' . $table] = [
                         'status' => 'unhealthy',
-                        'message' => "Table '{$table}' does not exist"
+                        'message' => "Table '{$table}' does not exist",
                     ];
                     $healthStatus['overall_status'] = 'unhealthy';
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $healthStatus['checks']['table_' . $table] = [
                     'status' => 'unhealthy',
-                    'message' => "Error checking table '{$table}': " . $e->getMessage()
+                    'message' => "Error checking table '{$table}': " . $e->getMessage(),
                 ];
                 $healthStatus['overall_status'] = 'unhealthy';
             }
@@ -99,19 +101,19 @@ class DashboardController extends Controller
             if (is_writable($storagePath)) {
                 $healthStatus['checks']['storage_permissions'] = [
                     'status' => 'healthy',
-                    'message' => 'Storage directory is writable'
+                    'message' => 'Storage directory is writable',
                 ];
             } else {
                 $healthStatus['checks']['storage_permissions'] = [
                     'status' => 'unhealthy',
-                    'message' => 'Storage directory is not writable'
+                    'message' => 'Storage directory is not writable',
                 ];
                 $healthStatus['overall_status'] = 'unhealthy';
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $healthStatus['checks']['storage_permissions'] = [
                 'status' => 'unhealthy',
-                'message' => 'Error checking storage permissions: ' . $e->getMessage()
+                'message' => 'Error checking storage permissions: ' . $e->getMessage(),
             ];
             $healthStatus['overall_status'] = 'unhealthy';
         }
@@ -122,23 +124,23 @@ class DashboardController extends Controller
             cache()->put($cacheKey, 'test', 60);
             $cached = cache()->get($cacheKey);
             cache()->forget($cacheKey);
-            
+
             if ($cached === 'test') {
                 $healthStatus['checks']['cache_system'] = [
                     'status' => 'healthy',
-                    'message' => 'Cache system is working properly'
+                    'message' => 'Cache system is working properly',
                 ];
             } else {
                 $healthStatus['checks']['cache_system'] = [
                     'status' => 'unhealthy',
-                    'message' => 'Cache system is not working properly'
+                    'message' => 'Cache system is not working properly',
                 ];
                 $healthStatus['overall_status'] = 'unhealthy';
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $healthStatus['checks']['cache_system'] = [
                 'status' => 'unhealthy',
-                'message' => 'Error checking cache system: ' . $e->getMessage()
+                'message' => 'Error checking cache system: ' . $e->getMessage(),
             ];
             $healthStatus['overall_status'] = 'unhealthy';
         }
@@ -148,24 +150,24 @@ class DashboardController extends Controller
             $versionCount = PlatformVersion::count();
             $activeVersionCount = PlatformVersion::where('is_active', true)->count();
             $userCount = User::count();
-            
+
             $healthStatus['checks']['version_manager_stats'] = [
                 'status' => 'healthy',
-                'message' => "Version manager operational",
+                'message' => 'Version manager operational',
                 'data' => [
                     'total_versions' => $versionCount,
                     'active_versions' => $activeVersionCount,
-                    'total_users' => $userCount
-                ]
+                    'total_users' => $userCount,
+                ],
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $healthStatus['checks']['version_manager_stats'] = [
                 'status' => 'unhealthy',
-                'message' => 'Error checking version manager stats: ' . $e->getMessage()
+                'message' => 'Error checking version manager stats: ' . $e->getMessage(),
             ];
             $healthStatus['overall_status'] = 'unhealthy';
         }
 
         return response()->json($healthStatus);
     }
-} 
+}

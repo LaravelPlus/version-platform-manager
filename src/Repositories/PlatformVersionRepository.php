@@ -1,13 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace LaravelPlus\VersionPlatformManager\Repositories;
 
-use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
 use Illuminate\Support\Collection;
 use LaravelPlus\VersionPlatformManager\Contracts\PlatformVersionRepositoryInterface;
+use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
 
-class PlatformVersionRepository implements PlatformVersionRepositoryInterface
+final class PlatformVersionRepository implements PlatformVersionRepositoryInterface
 {
     public function all(): Collection
     {
@@ -33,4 +34,4 @@ class PlatformVersionRepository implements PlatformVersionRepositoryInterface
     {
         return PlatformVersion::orderBy('version', 'desc')->paginate($perPage);
     }
-} 
+}

@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use LaravelPlus\VersionPlatformManager\Services\VersionService;
 
-class CreatePlatformVersion extends Command
+final class CreatePlatformVersion extends Command
 {
     /**
      * The name and signature of the console command.
@@ -41,6 +44,7 @@ class CreatePlatformVersion extends Command
 
         if (!$this->versionService->isValidVersion($version)) {
             $this->error('Invalid version format. Please use semantic versioning (e.g., 1.0.0)');
+
             return 1;
         }
 
@@ -54,10 +58,12 @@ class CreatePlatformVersion extends Command
             ]);
 
             $this->info("Platform version {$version} created successfully!");
+
             return 0;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Failed to create platform version: {$e->getMessage()}");
+
             return 1;
         }
     }
-} 
+}

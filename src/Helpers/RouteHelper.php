@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Helpers;
 
-class RouteHelper
+final class RouteHelper
 {
     /**
      * Get the route name prefix from config
@@ -17,7 +19,7 @@ class RouteHelper
      */
     public static function route(string $name): string
     {
-        return static::getPrefix() . '.' . $name;
+        return self::getPrefix() . '.' . $name;
     }
 
     /**
@@ -25,7 +27,7 @@ class RouteHelper
      */
     public static function dashboard(): string
     {
-        return static::route('dashboard');
+        return self::route('dashboard');
     }
 
     /**
@@ -33,7 +35,7 @@ class RouteHelper
      */
     public static function versions(string $action = 'index'): string
     {
-        return static::route('versions.' . $action);
+        return self::route('versions.' . $action);
     }
 
     /**
@@ -41,7 +43,7 @@ class RouteHelper
      */
     public static function users(string $action = 'index'): string
     {
-        return static::route('users.' . $action);
+        return self::route('users.' . $action);
     }
 
     /**
@@ -49,7 +51,7 @@ class RouteHelper
      */
     public static function analytics(string $action = 'index'): string
     {
-        return static::route('analytics.' . $action);
+        return self::route('analytics.' . $action);
     }
 
     /**
@@ -57,6 +59,6 @@ class RouteHelper
      */
     public static function whatsNew(string $action = 'index'): string
     {
-        return static::route('whats-new.' . $action);
+        return self::route('whats-new.' . $action);
     }
-} 
+}

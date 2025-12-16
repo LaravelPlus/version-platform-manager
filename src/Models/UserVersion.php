@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class UserVersion extends Model
+final class UserVersion extends Model
 {
     use HasFactory;
 
@@ -94,4 +96,4 @@ class UserVersion extends Model
     {
         return (int) str_replace('.', '', $this->version);
     }
-} 
+}

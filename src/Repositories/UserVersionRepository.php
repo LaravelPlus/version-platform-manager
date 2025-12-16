@@ -1,13 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace LaravelPlus\VersionPlatformManager\Repositories;
 
+use Illuminate\Support\Collection;
 use LaravelPlus\VersionPlatformManager\Contracts\UserVersionRepositoryInterface;
 use LaravelPlus\VersionPlatformManager\Models\UserVersion;
-use Illuminate\Support\Collection;
 
-class UserVersionRepository implements UserVersionRepositoryInterface
+final class UserVersionRepository implements UserVersionRepositoryInterface
 {
     public function all(): Collection
     {
@@ -43,4 +44,4 @@ class UserVersionRepository implements UserVersionRepositoryInterface
     {
         return UserVersion::where('version', '>', $version)->get();
     }
-} 
+}

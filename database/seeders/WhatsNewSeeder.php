@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
 use LaravelPlus\VersionPlatformManager\Models\WhatsNew;
 
-class WhatsNewSeeder extends Seeder
+final class WhatsNewSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,9 +16,10 @@ class WhatsNewSeeder extends Seeder
     public function run(): void
     {
         $version = PlatformVersion::first();
-        
+
         if (!$version) {
             $this->command->info('No platform version found. Please create a platform version first.');
+
             return;
         }
 
@@ -60,4 +63,4 @@ class WhatsNewSeeder extends Seeder
 
         $this->command->info('Sample WhatsNew content created successfully!');
     }
-} 
+}

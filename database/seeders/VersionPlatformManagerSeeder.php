@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LaravelPlus\VersionPlatformManager\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
 use LaravelPlus\VersionPlatformManager\Models\WhatsNew;
 
-class VersionPlatformManagerSeeder extends Seeder
+final class VersionPlatformManagerSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -86,4 +88,4 @@ class VersionPlatformManagerSeeder extends Seeder
             'sort_order' => 2,
         ]);
     }
-} 
+}

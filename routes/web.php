@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Route;
-use LaravelPlus\VersionPlatformManager\Http\Controllers\VersionController;
-use LaravelPlus\VersionPlatformManager\Http\Controllers\WhatsNewController;
-use LaravelPlus\VersionPlatformManager\Http\Controllers\UserController;
 use LaravelPlus\VersionPlatformManager\Http\Controllers\AnalyticsController;
 use LaravelPlus\VersionPlatformManager\Http\Controllers\DashboardController;
-use LaravelPlus\VersionPlatformManager\Http\Controllers\WhatsNewPageController;
+use LaravelPlus\VersionPlatformManager\Http\Controllers\UserController;
 use LaravelPlus\VersionPlatformManager\Http\Controllers\VersionAcknowledgmentController;
+use LaravelPlus\VersionPlatformManager\Http\Controllers\VersionController;
+use LaravelPlus\VersionPlatformManager\Http\Controllers\WhatsNewController;
+use LaravelPlus\VersionPlatformManager\Http\Controllers\WhatsNewPageController;
 
-Route::middleware(['web', 'auth'])->group(function () {
+Route::middleware(['web', 'auth'])->group(function (): void {
     // Mark version as seen
     Route::post('/version-platform-manager/mark-seen', [VersionController::class, 'markSeen'])
         ->name('version-platform-manager.mark-seen');
-    
+
     // Version acknowledgment routes
     Route::post('/version-platform-manager/mark-as-read', [VersionAcknowledgmentController::class, 'markAsRead'])
         ->name('version-platform-manager.mark-as-read');
@@ -25,13 +27,13 @@ Route::middleware(['web', 'auth'])->group(function () {
     // Version Manager Admin routes
     Route::prefix(config('version-platform-manager.admin.route_prefix', 'admin/version-manager'))
         ->middleware(['web', 'auth'])
-        ->group(function () {
+        ->group(function (): void {
             // Dashboard
             Route::get('/', [DashboardController::class, 'index'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.dashboard');
             Route::get('/health', [DashboardController::class, 'healthCheck'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.health');
 
             // Versions
-            Route::prefix('versions')->group(function () {
+            Route::prefix('versions')->group(function (): void {
                 Route::get('/', [VersionController::class, 'index'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.index');
                 Route::get('/create', [VersionController::class, 'create'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.create');
                 Route::post('/', [VersionController::class, 'store'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.store');
@@ -43,7 +45,7 @@ Route::middleware(['web', 'auth'])->group(function () {
             });
 
             // Users
-            Route::prefix('users')->group(function () {
+            Route::prefix('users')->group(function (): void {
                 Route::get('/', [UserController::class, 'index'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.users.index');
                 Route::get('/create', [UserController::class, 'create'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.users.create');
                 Route::post('/', [UserController::class, 'store'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.users.store');
@@ -53,13 +55,13 @@ Route::middleware(['web', 'auth'])->group(function () {
             });
 
             // Analytics
-            Route::prefix('analytics')->group(function () {
+            Route::prefix('analytics')->group(function (): void {
                 Route::get('/', [AnalyticsController::class, 'index'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.analytics.index');
                 Route::get('/export', [AnalyticsController::class, 'export'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.analytics.export');
             });
 
             // What's New
-            Route::prefix('whats-new')->group(function () {
+            Route::prefix('whats-new')->group(function (): void {
                 Route::get('/', [WhatsNewController::class, 'index'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.whats-new.index');
                 Route::get('/create', [WhatsNewController::class, 'create'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.whats-new.create');
                 Route::post('/', [WhatsNewController::class, 'store'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.whats-new.store');
@@ -73,7 +75,7 @@ Route::middleware(['web', 'auth'])->group(function () {
 });
 
 // Standalone What's New page (requires authentication)
-Route::middleware(['web'])->group(function () {
+Route::middleware(['web'])->group(function (): void {
     Route::get(config('version-platform-manager.public_whats_new.url', 'whats-new'), [WhatsNewPageController::class, 'index'])
         ->name('version-platform-manager.whats-new.public');
 

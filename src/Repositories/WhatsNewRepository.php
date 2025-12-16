@@ -1,14 +1,15 @@
 <?php
+
 declare(strict_types=1);
 
 namespace LaravelPlus\VersionPlatformManager\Repositories;
 
-use LaravelPlus\VersionPlatformManager\Contracts\WhatsNewRepositoryInterface;
-use LaravelPlus\VersionPlatformManager\Models\WhatsNew;
-use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
 use Illuminate\Support\Collection;
+use LaravelPlus\VersionPlatformManager\Contracts\WhatsNewRepositoryInterface;
+use LaravelPlus\VersionPlatformManager\Models\PlatformVersion;
+use LaravelPlus\VersionPlatformManager\Models\WhatsNew;
 
-class WhatsNewRepository implements WhatsNewRepositoryInterface
+final class WhatsNewRepository implements WhatsNewRepositoryInterface
 {
     /**
      * Get all WhatsNew entries with platform version relationship.
@@ -44,7 +45,7 @@ class WhatsNewRepository implements WhatsNewRepositoryInterface
      */
     public function forPlatformVersion(string $version): Collection
     {
-        return WhatsNew::whereHas('platformVersion', function ($query) use ($version) {
+        return WhatsNew::whereHas('platformVersion', function ($query) use ($version): void {
             $query->where('version', $version);
         })->with('platformVersion')->orderBy('sort_order')->get();
     }
@@ -121,7 +122,7 @@ class WhatsNewRepository implements WhatsNewRepositoryInterface
     {
         $maxOrder = WhatsNew::where('platform_version_id', $platformVersionId)
             ->max('sort_order');
-        
+
         return ($maxOrder ?? 0) + 1;
     }
 
@@ -131,16 +132,16 @@ class WhatsNewRepository implements WhatsNewRepositoryInterface
     public function bulkCreate(array $entries, int $platformVersionId): int
     {
         $created = 0;
-        
+
         foreach ($entries as $entry) {
             $entry['platform_version_id'] = $platformVersionId;
             $entry['sort_order'] = $entry['sort_order'] ?? $this->getNextSortOrder($platformVersionId);
-            
+
             if ($this->create($entry)) {
                 $created++;
             }
         }
-        
+
         return $created;
     }
-} 
+}
