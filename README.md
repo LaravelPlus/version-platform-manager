@@ -126,6 +126,14 @@ You can add, remove, or reorder links. Each link supports:
 - The sidebar will highlight the active link for both route and URL types.
 - You can use any SVG icon markup for the `icon` field.
 
+## Admin authorization
+
+The admin area (`admin/version-manager/*`) is denied (404) unless your app defines the `viewVersionManager` gate:
+
+```php
+Gate::define('viewVersionManager', fn ($user) => $user->is_admin);
+```
+
 ## Database Structure
 
 ### Platform Versions Table

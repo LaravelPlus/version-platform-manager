@@ -199,7 +199,7 @@ This release introduces a completely redesigned user dashboard with improved nav
                                     
                                     <!-- Feature Content with Markdown Rendering -->
                                     <div class="prose prose-sm max-w-none text-gray-600 leading-relaxed">
-                                        {!! Str::markdown($feature->content) !!}
+                                        {!! Str::markdown($feature->content, ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}
                                     </div>
                                     
                                     <!-- Feature Meta -->

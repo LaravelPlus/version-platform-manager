@@ -130,7 +130,10 @@ createApp({
         },
         
         simpleMarkdownToHtml(markdown) {
-            return markdown
+            // escape first so no raw HTML from content reaches v-html
+            return String(markdown)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
                 .replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold text-gray-900 mb-2">$1</h3>')
                 .replace(/^## (.*$)/gim, '<h2 class="text-xl font-semibold text-gray-900 mb-3">$1</h2>')
                 .replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold text-gray-900 mb-4">$1</h1>')
