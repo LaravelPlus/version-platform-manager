@@ -20,7 +20,7 @@ final class VersionPlatformManagerServiceProvider extends ServiceProvider
             __DIR__.'/../../config/version-platform-manager.php', 'version-platform-manager'
         );
 
-        $this->app->singleton(VersionService::class, fn ($app) => new VersionService());
+        $this->app->singleton(VersionService::class, fn ($app) => new VersionService);
 
         $this->app->bind(\LaravelPlus\VersionPlatformManager\Contracts\PlatformVersionRepositoryInterface::class, \LaravelPlus\VersionPlatformManager\Repositories\PlatformVersionRepository::class);
         $this->app->bind(\LaravelPlus\VersionPlatformManager\Contracts\WhatsNewRepositoryInterface::class, \LaravelPlus\VersionPlatformManager\Repositories\WhatsNewRepository::class);
@@ -84,6 +84,7 @@ final class VersionPlatformManagerServiceProvider extends ServiceProvider
      */
     protected function registerMiddleware(): void
     {
+        $this->app['router']->aliasMiddleware('version-manager.admin', \LaravelPlus\VersionPlatformManager\Http\Middleware\AuthorizeAdmin::class);
         $this->app['router']->aliasMiddleware('version.updates', \LaravelPlus\VersionPlatformManager\Middleware\CheckVersionUpdates::class);
     }
 

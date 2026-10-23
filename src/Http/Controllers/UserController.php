@@ -7,6 +7,7 @@ namespace LaravelPlus\VersionPlatformManager\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 use LaravelPlus\VersionPlatformManager\Contracts\UserRepositoryInterface;
 
@@ -48,12 +49,15 @@ final class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|string|in:admin,user',
+            'role' => 'nullable|string|in:admin,user',
         ]);
+        if (!Schema::hasColumn('users', 'role')) {
+            unset($validated['role']); // package migrations don't create it
+        }
         $validated['password'] = bcrypt($validated['password']);
         $this->userRepository->create($validated);
 
-        return redirect()->route('version-manager.users.index')
+        return redirect()->route(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.users.index')
             ->with('success', 'User created successfully.');
     }
 
@@ -76,9 +80,12 @@ final class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'required|string|in:admin,user',
+            'role' => 'nullable|string|in:admin,user',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
+        if (!Schema::hasColumn('users', 'role')) {
+            unset($validated['role']); // package migrations don't create it
+        }
         if (!empty($validated['password'])) {
             $validated['password'] = bcrypt($validated['password']);
         } else {
@@ -86,7 +93,7 @@ final class UserController extends Controller
         }
         $this->userRepository->update($user, $validated);
 
-        return redirect()->route('version-manager.users.index')
+        return redirect()->route(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.users.index')
             ->with('success', 'User updated successfully.');
     }
 
@@ -98,7 +105,7 @@ final class UserController extends Controller
         $user = $this->userRepository->find((int) $user);
         $this->userRepository->delete($user);
 
-        return redirect()->route('version-manager.users.index')
+        return redirect()->route(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.users.index')
             ->with('success', 'User deleted successfully.');
     }
 }

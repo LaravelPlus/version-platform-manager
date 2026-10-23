@@ -26,7 +26,7 @@ Route::middleware(['web', 'auth'])->group(function (): void {
 
     // Version Manager Admin routes
     Route::prefix(config('version-platform-manager.admin.route_prefix', 'admin/version-manager'))
-        ->middleware(['web', 'auth'])
+        ->middleware(['web', 'auth', 'version-manager.admin'])
         ->group(function (): void {
             // Dashboard
             Route::get('/', [DashboardController::class, 'index'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.dashboard');
@@ -37,11 +37,11 @@ Route::middleware(['web', 'auth'])->group(function (): void {
                 Route::get('/', [VersionController::class, 'index'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.index');
                 Route::get('/create', [VersionController::class, 'create'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.create');
                 Route::post('/', [VersionController::class, 'store'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.store');
+                Route::get('/next-version', [VersionController::class, 'getNextVersion'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.next-version');
                 Route::get('/{version}', [VersionController::class, 'show'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.show');
                 Route::get('/{version}/edit', [VersionController::class, 'edit'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.edit');
                 Route::put('/{version}', [VersionController::class, 'update'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.update');
                 Route::delete('/{version}', [VersionController::class, 'destroy'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.destroy');
-                Route::get('/next-version', [VersionController::class, 'getNextVersion'])->name(config('version-platform-manager.admin.route_name_prefix', 'version-manager') . '.versions.next-version');
             });
 
             // Users
@@ -75,7 +75,7 @@ Route::middleware(['web', 'auth'])->group(function (): void {
 });
 
 // Standalone What's New page (requires authentication)
-Route::middleware(['web'])->group(function (): void {
+Route::middleware(['web', 'auth'])->group(function (): void {
     Route::get(config('version-platform-manager.public_whats_new.url', 'whats-new'), [WhatsNewPageController::class, 'index'])
         ->name('version-platform-manager.whats-new.public');
 

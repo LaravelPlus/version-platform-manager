@@ -85,11 +85,11 @@ createApp({
     data() {
         return {
             showModal: {{ isset($autoShow) && $autoShow ? 'true' : 'false' }},
-            title: `{!! $title ?? '🎉 Exciting News: 🎉 <br> Major Updates to Improve Your Experience!' !!}`,
+            title: @js($title ?? '🎉 Exciting News: 🎉 <br> Major Updates to Improve Your Experience!'),
             userVersion: '{{ $userVersion->version ?? "1.0.0" }}',
             latestVersion: @json($latestVersion ?? null),
             whatsNew: @json($whatsNew ?? []),
-            signature: `{!! config('version-platform-manager.whats_new_signature') !!}`,
+            signature: @js((string) config('version-platform-manager.whats_new_signature')),
             isLoading: false
         }
     },

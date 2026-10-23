@@ -167,7 +167,7 @@ The old API endpoint will be removed in version 2.0.">{{ old('whats_new_markdown
                                 <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 min-h-[400px] overflow-y-auto">
                                     <div id="preview-content" class="prose prose-sm max-w-none">
                                         @if($version->whatsNewMarkdown)
-                                            {!! \Illuminate\Support\Str::markdown($version->whatsNewMarkdown) !!}
+                                            {!! \Illuminate\Support\Str::markdown($version->whatsNewMarkdown, ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}
                                         @else
                                             <div class="text-gray-400 text-center py-12">
                                                 <svg class="mx-auto h-16 w-16 mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
